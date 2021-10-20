@@ -1,5 +1,5 @@
 #include "Binary.h"
-#include "../assembler/debug.h"
+#include "../log/log.h"
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -21,7 +21,7 @@ Binary_err binary_init(Binary* bin, ssize_t cap)
     return BIN_NOERR;
 }
 
-Binary_err binary_sread(Binary* bin, bin_t* src, size_t count)
+Binary_err binary_sread(Binary* bin, void* src, size_t count)
 {
     ASSERT(bin && src, BIN_NULLPTR);
     ASSERT(bin->buffer, BIN_NULL_BUF);
@@ -50,7 +50,7 @@ Binary_err binary_fread(Binary* bin, FILE* istream, size_t count)
     return BIN_NOERR;
 }
 
-Binary_err binary_swrite(bin_t* dst, Binary* bin, size_t count)
+Binary_err binary_swrite(void* dst, Binary* bin, size_t count)
 {
     ASSERT(dst && bin, BIN_NULLPTR);
     ASSERT(bin->buffer, BIN_NULL_BUF);

@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-#include "../debug.h"
 
 ///constructor block
 static void set_index_arr(char* buffer, Index* index_arr, size_t index_arr_size)

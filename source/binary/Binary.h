@@ -4,23 +4,38 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/// Binary code type
-typedef double bin_t;
+enum cmd_num
+{
+    CMD_IN   = 1,
+    CMD_OUT  = 2,
+    CMD_MUL  = 3,
+    CMD_ADD  = 4,
+    CMD_HAL  = 5,
+    CMD_PUSH = 6,
+};
+
+/// Command type
+union cmd_t 
+{
+    struct
+    {
+        unsigned char cmd:    5;
+        unsigned char n_args: 3;
+    } bits;
+    
+    unsigned char byte;
+};
+
+/// Arguments type
+typedef double arg_t;
+
+typedef unsigned char bin_t;
 
 /// Max amount of args
 static const size_t ARGS_CAP = 0x8;
 
-enum asm_cmd
-{
-    NOCMD = 0,
-    in    = 1,
-    out   = 2, 
-    add   = 3,
-    mul   = 4,
-    push  = 5,
-    hal      ,
-    BAD_CMD,
-};
+/// Capacity of binary line buffer
+const size_t BIN_LINE_CAP = 0x100;
 
 enum Binary_err
 {
@@ -42,11 +57,11 @@ struct Binary
 
 Binary_err binary_init(Binary* bin, ssize_t cap);
 
-Binary_err binary_sread(Binary* bin, bin_t* src, size_t count);
+Binary_err binary_sread(Binary* bin, void* src, size_t count);
 
 Binary_err binary_fread(Binary* bin, FILE* istream, size_t count);
 
-Binary_err binary_swrite(bin_t* dst, Binary* bin, size_t count);
+Binary_err binary_swrite(void* dst, Binary* bin, size_t count);
 
 Binary_err binary_fwrite(FILE* ostream, Binary* bin, size_t count);
 
