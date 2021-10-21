@@ -25,6 +25,10 @@ static cpu_err get_arg(arg_t* dst_arg, Binary* bin)
     return CPU_NOERR;
 }
 
+#define DEF_CMD(TEXT, n_args, CODE)    \
+    case CMD_##TEXT:                   \
+        CODE                           \
+
 cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
 {
     Stack stk = {};
@@ -37,35 +41,8 @@ cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
 
         switch(cmd.bits.cmd)
         {
-            case CMD_PUSH:
-            {
-                arg_t arg = 0;
-                get_arg(&arg, bin);
-
-                stack_push(&stk, arg);
-                
-                break;
-            }
-            case CMD_ADD:
-            {
-                arg_t fst_term = 0;
-                arg_t snd_term = 0;
-                stack_pop(&stk, &fst_term);
-                stack_pop(&stk, &snd_term);
-
-                stack_push(&stk, fst_term + snd_term);
-
-                break;
-            }
-            case CMD_OUT:
-            {
-                arg_t temp = 0;
-                stack_pop(&stk, &temp);
-
-                printf("%lg ", temp);
-                
-                break;
-            }
+            #include "../def_cmd.inc"
+            
             default:
             {
                 ASSERT(0, CPU_UNKNWN_CMD);
@@ -77,3 +54,5 @@ cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
 
     return CPU_NOERR;
 }  
+
+#undef DEF_CMD

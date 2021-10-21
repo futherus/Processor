@@ -6,7 +6,7 @@
 
 #include "parser.h"
 #include "../log/log.h"
-#include "list.h"
+#include "asm_list.h"
 
 struct Expression
 {
@@ -16,19 +16,27 @@ struct Expression
     size_t n_args = 0;
 };
  
-#define DEF_CMD(text, binary, num_args)                                         \
-    (strcmp(expr->txt_cmd, #text) == 0)                                         \
+static parser_err get_args(Expression* expr, char* txt_line, size_t* pos)
+{
+    for(size_t iter = 0; iter < expr->n_args; iter++)
+    {
+        size_t n_read = 0;
+
+        sscanf(txt_line + *pos, "%lg%n", &(expr->args[iter]), &n_read);
+        
+        *pos += n_read;
+    }
+
+    return PARSER_NOERR;
+}
+
+#define DEF_CMD(TEXT, N_ARGS, code)                                             \
+    if (strcmp(expr->txt_cmd, #TEXT) == 0)                                      \
     {                                                                           \
-        expr->bin_cmd = (binary);                                               \
-        expr->n_args  = (num_args);                                             \
-                                                                                \
-        for(size_t iter = 0; iter < (num_args); iter++)                         \
-        {                                                                       \
-            size_t n_read = 0;                                                  \
-            sscanf(txt_line + pos, "%lg%n", &(expr->args[iter]), &n_read);      \
-            pos += n_read;                                                      \
-        }                                                                       \
+        expr->bin_cmd = (CMD_##TEXT);                                           \
+        expr->n_args  = (N_ARGS);                                               \
     }                                                                           \
+    else                                                                        \
 
 static parser_err get_expr(Expression* expr, char* txt_line)
 {
@@ -37,22 +45,18 @@ static parser_err get_expr(Expression* expr, char* txt_line)
     size_t pos = 0;
     sscanf(txt_line, "%s%n", expr->txt_cmd, &pos);
 
-    if      DEF_CMD(in,   CMD_IN,    0)
-    else if DEF_CMD(out,  CMD_OUT,   0)
-    else if DEF_CMD(mul,  CMD_MUL,   0)
-    else if DEF_CMD(add,  CMD_ADD,   0)
-    else if DEF_CMD(hal,  CMD_HAL,   0)
-    else if DEF_CMD(push, CMD_PUSH,  1)
-    else
-    {
-        ASSERT(0, PARSER_UNKNWN_CMD);
-    }
+    #include "../def_cmd.inc"
+    /* else */ ASSERT(0, PARSER_UNKNWN_CMD);
+
+    get_args(expr, txt_line, &pos);
 
     char probe = 0;
-    ASSERT(sscanf(txt_line, " %c", &probe) != EOF, PARSER_UNEXPCTD_ARGS);
+    ASSERT(sscanf(txt_line + pos, " %c", &probe) == EOF, PARSER_UNEXPCTD_ARGS);
 
     return PARSER_NOERR;
 }
+
+#undef DEF_CMD
 
 static parser_err put_expr(bin_t* dst_line, size_t* dst_sz, Expression* expr)
 {
@@ -102,6 +106,7 @@ parser_err parser(Binary* bin, const Text* txt)
 
     for(size_t line = 0; line < n_line; line++)
     {
+        DI$(line);
         size_t bin_line_sz = 0;
         bin_t bin_line[BIN_LINE_CAP] = {0};
 

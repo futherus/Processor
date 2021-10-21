@@ -21,7 +21,7 @@ static FILE* log_stream_()
     {
         first_call = 0;
 
-        stream = fopen(PROCESSOR_LOGFILE, "w");
+        stream = fopen(LOGFILE, "w");
 
         if(stream)
             atexit(&close_logstream_);

@@ -3,7 +3,7 @@
 
 #include "../binary/Binary.h"
 
-const char LISTFILE[] = "asm_list.txt";
+const char ASM_LISTFILE[] = "asm_list.txt";
 
 void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line);
 

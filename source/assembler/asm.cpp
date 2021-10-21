@@ -7,6 +7,8 @@
 #include "../log/log.h"
 #include "../binary/Binary.h"
 
+const char LOGFILE[] = "asm_log.txt";
+
 enum asm_err
 {
     ASM_NOERR      = 0,
@@ -48,8 +50,6 @@ int main(int argc, char* argv[])
     
     L$(text_destroy(&txt);)
     L$(ASSERT(binary_dstr(&bin) == 0, ASM_BIN_FAIL);)
-
-    ASSERT(0, ASM_ARGS_FAIL);
 
     return ASM_NOERR;
 }

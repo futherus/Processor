@@ -8,6 +8,8 @@
 #include "../args/args.h"
 #include "../log/log.h"
 
+const char LOGFILE[] = "cpu_log.txt";
+
 static int file_sz(const char filename[], ssize_t* sz)
 {
     struct stat buff = {};
@@ -21,32 +23,31 @@ static int file_sz(const char filename[], ssize_t* sz)
 
 int main(int argc, char* argv[])
 {
-    char binfile_name[MAX_FILENAME_SIZE] = "bin";
-    char outfile_name[MAX_FILENAME_SIZE] = "";
+    char binfile_name[MAX_FILENAME_SIZE] = "";
+    char outfile_name[MAX_FILENAME_SIZE] = "";  /* not used */
 
-    args_msg msg = process_args(argc, argv, binfile_name, outfile_name);
+    args_msg msg = process_args(argc, argv, binfile_name, outfile_name); 
     if(msg)
         response_args(msg);
 
     ssize_t binfile_sz = 0;
-    ASSERT(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);
+    L$(ASSERT(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);)
     binfile_sz = binfile_sz / sizeof(bin_t);
 
     FILE* binstream = fopen(binfile_name, "rb");
     ASSERT(binstream, CPU_READ_FAIL);
 
     Binary bin = {};
-    Binary_err err = BIN_NOERR;
     ASSERT(binary_init(&bin, binfile_sz) == 0, CPU_BIN_FAIL);
 
-    ASSERT(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);
+    L$(ASSERT(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);)
 
     ASSERT(fclose(binstream) == 0, CPU_READ_FAIL);
 
     FILE* istream = stdin;
     FILE* ostream = stdout;
 
-    processing(&bin, istream, ostream);
+    L$(ASSERT(processing(&bin, istream, ostream) == 0, CPU_PROCESSING_FAIL);)
 
     ASSERT(binary_dstr(&bin) == 0, CPU_BIN_FAIL);
 

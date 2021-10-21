@@ -11,6 +11,7 @@ enum cpu_err
     CPU_UNKNWN_CMD,
     CPU_READCMD_FAIL,
     CPU_READARG_FAIL,
+    CPU_PROCESSING_FAIL,
 };
 
 cpu_err processing(Binary* bin, FILE* istream, FILE* ostream);

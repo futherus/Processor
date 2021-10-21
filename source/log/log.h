@@ -1,12 +1,20 @@
 #ifndef LOG_H
 #define LOG_H
 
-const char PROCESSOR_LOGFILE[] = "log.txt";
+extern const char LOGFILE[];
 
 void mem_dump(void* src_ptr, const char msg[]);
 
 #define L$(str) log_(#str, __FILE__, __func__, __LINE__);                   \
                 str                                                         \
+
+#define DI$(uint64)                                                         \
+    do                                                                      \
+    {                                                                       \
+        char temp[1000] = #uint64;                                          \
+        sprintf(temp + sizeof(#uint64) - 1, ": %llu", uint64);              \
+        log_(temp, __FILE__, __func__, __LINE__);                           \
+    } while(0)                                                              \
 
 #define ASSERT(condition, err)                                              \
     do                                                                      \

@@ -4,15 +4,15 @@
 #include <stdint.h>
 #include <stdio.h>
 
-enum cmd_num
+#define DEF_CMD(TEXT, args, code)   \
+    CMD_##TEXT,                     \
+
+enum cmd_bin_code
 {
-    CMD_IN   = 1,
-    CMD_OUT  = 2,
-    CMD_MUL  = 3,
-    CMD_ADD  = 4,
-    CMD_HAL  = 5,
-    CMD_PUSH = 6,
+    #include "../def_cmd.inc"
 };
+
+#undef DEF_CMD
 
 /// Command type
 union cmd_t 

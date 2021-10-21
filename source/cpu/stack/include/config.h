@@ -10,7 +10,7 @@
                 typedef double Elem_t;
 
                 /// Path to file for logs
-                const char STACK_LOGFILE[] = "stack_log.txt";
+                const char STACK_LOGFILE[] = "stack_dump.txt";
 
                 /// \brief Turn on protection for stack
                 #define DEBUG
@@ -24,7 +24,7 @@
 
 #ifdef DUMP
                 /// \brief Turn on all dumps (Does not work without DEBUG and DUMP defines)
-                #define DUMP_ALL
+                //#define DUMP_ALL
 #endif
 
                 /// \brief Turn on stack hash (Does not work without DEBUG define)

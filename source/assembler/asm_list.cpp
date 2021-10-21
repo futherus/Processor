@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "list.h"
+#include "asm_list.h"
 
 static FILE* list_stream_();
 
@@ -20,7 +20,7 @@ static FILE* list_stream_()
     {
         first_call = 0;
 
-        stream = fopen(LISTFILE, "w");
+        stream = fopen(ASM_LISTFILE, "w");
 
         if(stream)
             atexit(&close_liststream_);
@@ -31,7 +31,7 @@ static FILE* list_stream_()
     return stream;
 }
 
-#define PRINT(format, ...) fprintf(stream, (format), ##__VA_ARGS__) 
+#define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__) 
 
 void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 {
@@ -42,15 +42,17 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 
     if(first_call)
     {
-        PRINT("|Line|Command|Binary\n");
+        PRINT("|Line|Command----------|Binary\n");
         first_call = 0;
     }
 
     PRINT("|%4llu|", line);
-    PRINT("%-7s|", txt_line);
+    PRINT("%-17s|", txt_line);
     for(size_t iter = 0; iter < bin_line_sz; iter++)
     {
         PRINT("%02hx ", bin_line[iter]);
     }
     PRINT("\n");
+
+    fflush(stream);
 }
