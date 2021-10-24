@@ -1,13 +1,16 @@
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "text/Text.h"
 #include "../args/args.h"
-#include "parser.h"
+#include "preprocessor.h"
 #include "../log/log.h"
 #include "../binary/Binary.h"
 
-const char LOGFILE[] = "asm_log.txt";
+const char LOGFILE[] = "asm_logs/asm_log.txt";
 
 enum asm_err
 {
@@ -34,21 +37,21 @@ int main(int argc, char* argv[])
     Text txt = {};
     L$(ASSERT(text_create(&txt, infile_name) == 0, ASM_READ_FAIL);)
 
-    //text_clean(txt, ';'); // function cleans all after delimiter ///How to add function to Text in order not to change Text.cpp/Text.h
+    //text_clean(txt, ';'); // function cleans all after delimiter
 
     Binary bin = {};
-    L$(ASSERT(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size) == 0, ASM_BIN_FAIL);)
+    ASSERT(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size) == 0, ASM_BIN_FAIL);
 
-    L$(ASSERT(parser(&bin, &txt) == 0, ASM_PARSE_FAIL);)
+    L$(ASSERT(preprocessor(&bin, &txt) == 0, ASM_PARSE_FAIL);)
 
     FILE* ostream = fopen(outfile_name, "wb");
-    L$(ASSERT(ostream, ASM_WRITE_FAIL);)
+    ASSERT(ostream, ASM_WRITE_FAIL);
     
-    L$(ASSERT(binary_fwrite(ostream, &bin, bin.sz) == 0, ASM_WRITE_FAIL);)
+    ASSERT(binary_fwrite(ostream, &bin, bin.sz) == 0, ASM_WRITE_FAIL);
 
-    L$(ASSERT(fclose(ostream) == 0, ASM_WRITE_FAIL);)
+    ASSERT(fclose(ostream) == 0, ASM_WRITE_FAIL);
     
-    L$(text_destroy(&txt);)
+    text_destroy(&txt);
     L$(ASSERT(binary_dstr(&bin) == 0, ASM_BIN_FAIL);)
 
     return ASM_NOERR;

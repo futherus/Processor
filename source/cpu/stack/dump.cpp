@@ -2,10 +2,13 @@
 
 #ifdef DUMP
 
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+#include <stdio.h>
 #include "include/Stack.h"
 #include <string.h>
 #include <assert.h>
-#include <stdio.h>
 
 static void (*PRINT_ELEM)(FILE*, const Elem_t*) = nullptr;
 

@@ -69,7 +69,7 @@ Binary_err binary_fwrite(FILE* ostream, Binary* bin, size_t count)
     ASSERT(bin->buffer, BIN_NULL_BUF);
     ASSERT(count <= bin->sz - bin->ip, BIN_SIZE_ERR);
 
-    L$(size_t n_written = fwrite(&bin->buffer[bin->ip], sizeof(bin_t), count, ostream);)
+    size_t n_written = fwrite(&bin->buffer[bin->ip], sizeof(bin_t), count, ostream);
     ASSERT(n_written == count, BIN_STREAM_FAIL);
 
     bin->ip += count;

@@ -1,15 +1,25 @@
 #ifndef BINARY_H
 #define BINARY_H
 
-#include <stdint.h>
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
 #include <stdio.h>
+
+#include <stdint.h>
+#include "../hash.h"
 
 #define DEF_CMD(TEXT, args, code)   \
     CMD_##TEXT,                     \
 
 enum cmd_bin_code
 {
-    #include "../def_cmd.inc"
+    EMBCMD_push = 1,
+    EMBCMD_pop  = 2,
+    EMBCMD_add  = 3,
+    EMBCMD_sub  = 4,
+
+    //#include "../def_cmd.inc"
 };
 
 #undef DEF_CMD
@@ -19,23 +29,26 @@ union cmd_t
 {
     struct
     {
-        unsigned char cmd:    5;
-        unsigned char n_args: 3;
+        unsigned char cmd: 6;
+        unsigned char reg: 1;
+        unsigned char mem: 1;
     } bits;
     
     unsigned char byte;
 };
 
-/// Arguments type
-typedef double arg_t;
+/// bin types
+typedef double        val64_t;
+typedef unsigned char val8_t;
 
+/// specifier type
+typedef int           spec_t;
+
+/// Binary type
 typedef unsigned char bin_t;
 
-/// Max amount of args
-static const size_t ARGS_CAP = 0x8;
-
 /// Capacity of binary line buffer
-const size_t BIN_LINE_CAP = 0x100;
+const size_t BIN_LINE_CAP = 0x200;
 
 enum Binary_err
 {

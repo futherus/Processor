@@ -1,3 +1,6 @@
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,22 +44,4 @@ void log_(const char str[], const char file[], const char func[], int line)
         return;
 
     PRINT("%-20s||%4d|| %-90s || %-70s || %s %s\n", func, line, str, file, __DATE__, __TIME__);
-}
-
-void mem_dump(void* src_ptr, const char msg[])
-{
-        uint32_t* ptr = (uint32_t*) src_ptr;
-
-        fprintf(stderr, "%s", msg);
-        fprintf(stderr, "-----------------------------------------------");
-        for(long iter = -64; iter < 64; iter++)
-        {
-                if(iter == 0)
-                        fprintf(stderr, "\n");
-                if(iter % 4 == 0)
-                        fprintf(stderr, "\n" "%p:", ptr + iter);
-
-                fprintf(stderr, "|%08x|", *(ptr + iter));
-        }
-        fprintf(stderr, "\n-----------------------------------------------\n\n");
 }

@@ -2,7 +2,12 @@
 #include "include/Stack.h"
 #include <string.h>
 #include <stdlib.h>
+
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
 #include <stdio.h>
+
 #include <assert.h>
 
 ////////////////////////////////////////////////////////////////
