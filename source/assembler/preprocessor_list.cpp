@@ -10,6 +10,19 @@
 static FILE* PREPROCESSOR_STREAM = nullptr;
 static FILE* BINLINE_STREAM      = nullptr;
 
+const static char MISSING_SIGN[]        = "sign before literal is missing";
+const static char SIGN_DUPLICATE[]      = "sign of literal is duplicated";
+const static char MISSING_PARENTHESIS[] = "closing parenthesis is missing";
+const static char TRAILING_SYMBOLS[]    = "trailing symbols in argument";
+const static char TRAILING_COMMA[]      = "trailing comma";
+const static char INVALID_ARG[]         = "argument is invalid";
+const static char UNKNWN_ARG[]          = "unknown argument";
+const static char INVALID_ARGS_NUM[]    = "invalid amount of args entered";
+const static char LITS_FOR_SYS[]        = "system command can get only one-literal argument";
+const static char SIGN_FOR_SYS[]        = "system command cannot have signed argument";
+const static char IMMCONST_FOR_POP[]    = "`pop` command cannot access number";
+const static char UNKNWN_CMD[]          = "unknown command";
+
 static void close_liststream_()
 {
     if(fclose(PREPROCESSOR_STREAM) != 0 || fclose(BINLINE_STREAM) != 0)
@@ -24,9 +37,9 @@ static int list_stream_()
     {
         first_call = 0;
 
-        BINLINE_STREAM = fopen(BINLINE_LISTFILE, "w");
+        BINLINE_STREAM      = fopen(BINLINE_LISTFILE,      "w");
         PREPROCESSOR_STREAM = fopen(PREPROCESSOR_LISTFILE, "w");
-
+        
         if(BINLINE_STREAM && PREPROCESSOR_STREAM)
             atexit(&close_liststream_);
         else
@@ -41,7 +54,63 @@ static int list_stream_()
 
 #define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__) 
 
-//////////////////////// Line listing ////////////////////////
+////////////////////////    Error logging   ////////////////////////
+void log_err(const char infile_name[])
+{
+    FILE* stream = stderr;
+
+    Preprocessor_errstruct* ptr = preprocessor_errstruct();
+    PRINT("\n" "%s:%llu:%llu: ", infile_name, ptr->line + 1, ptr->pos);
+    PRINT("error: ");
+    
+    switch(ptr->errnum)
+    {
+        case PREPROCESSOR_MISSING_SIGN:
+            PRINT("%s\n", MISSING_SIGN);
+            break;
+        case PREPROCESSOR_SIGN_DUPLICATE:
+            PRINT("%s\n", SIGN_DUPLICATE);
+            break;
+        case PREPROCESSOR_MISSING_PARENTHESIS:
+            PRINT("%s\n", MISSING_PARENTHESIS);
+            break;
+        case PREPROCESSOR_TRAILING_SYMBOLS:
+            PRINT("%s\n", TRAILING_SYMBOLS);
+            break;
+        case PREPROCESSOR_TRAILING_COMMA:
+            PRINT("%s\n", TRAILING_COMMA);
+            break;
+        case PREPROCESSOR_INVALID_ARG:
+            PRINT("%s\n", INVALID_ARG);
+            break;
+        case PREPROCESSOR_UNKNWN_ARG:
+            PRINT("%s\n", UNKNWN_ARG);
+            break;
+        case PREPROCESSOR_INVALID_ARGS_NUM:
+            PRINT("%s\n", INVALID_ARGS_NUM);
+            break;
+        case PREPROCESSOR_LITS_FOR_SYS:
+            PRINT("%s\n", LITS_FOR_SYS);
+            break;
+        case PREPROCESSOR_SIGN_FOR_SYS:
+            PRINT("%s\n", SIGN_FOR_SYS);
+            break;
+        case PREPROCESSOR_UNKNWN_CMD:
+            PRINT("%s\n", UNKNWN_CMD);
+            break;
+        case PREPROCESSOR_IMMCONST_FOR_POP:
+            PRINT("%s\n", IMMCONST_FOR_POP);
+            break;
+        case PREPROCESSOR_NOERR:
+            /* fallthrough */
+        default:
+            PRINT("Error type was not set\n");
+    }
+
+    PRINT("    %s\n\n", ptr->txt);
+}
+
+////////////////////////    Line listing    ////////////////////////
 void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 {
     list_stream_();
@@ -102,7 +171,7 @@ static void list_arg(Argument* arg, FILE* stream)
 
     PRINT("      Literals:\n");
     PRINT("      {\n");
-    for(size_t lit_iter = 0; lit_iter < LITS_CAP; lit_iter++)
+    for(size_t lit_iter = 0; lit_iter < arg->literals_sz; lit_iter++)
     {
         PRINT("        Literal #%llu\n", lit_iter);
         list_lit(&arg->literals[lit_iter], stream);
@@ -127,7 +196,7 @@ void list_expr(Expression* expr, char* txt)
 
     PRINT("  Arguments:\n");
     PRINT("  {\n");
-    for(size_t arg_iter = 0; arg_iter < ARGS_CAP; arg_iter++)
+    for(size_t arg_iter = 0; arg_iter < expr->args_sz; arg_iter++)
     {
         PRINT("    Argument #%llu\n", arg_iter);
         list_arg(&expr->args[arg_iter], stream);

@@ -3,8 +3,6 @@
 
 extern const char LOGFILE[];
 
-void mem_dump(void* src_ptr, const char msg[]);
-
 #define L$(str) log_(#str, __FILE__, __func__, __LINE__);                   \
                 str                                                         \
 

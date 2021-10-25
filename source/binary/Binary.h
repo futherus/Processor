@@ -9,22 +9,45 @@
 #include <stdint.h>
 #include "../hash.h"
 
-#define DEF_CMD(TEXT, args, code)   \
-    CMD_##TEXT,                     \
+//////////////////////////////////////////////
+#define DEF_SYSCMD(TEXT, hash, n_args, code) \
+    SYSCMD_##TEXT,                           \
+
+#define DEF_CMD(TEXT, hash, n_args, code)    \
+    CMD_##TEXT,                              \
 
 enum cmd_bin_code
 {
-    EMBCMD_push = 1,
-    EMBCMD_pop  = 2,
-    EMBCMD_add  = 3,
-    EMBCMD_sub  = 4,
-
-    //#include "../def_cmd.inc"
+    #include "../def_syscmd.inc"
+    
+    #include "../def_cmd.inc"
 };
 
 #undef DEF_CMD
+#undef DEF_SYSCMD
+/////////////////////////////////////////////
+#define DEF_REG(TXT, hash)                  \
+    REG_##TXT,                              \
 
-/// Command type
+enum reg_bin_code
+{
+    #include "../def_reg.inc"
+};
+
+#undef DEF_REG
+/////////////////////////////////////////////
+
+/// bin types
+typedef double        val64_t;
+typedef unsigned char val8_t;
+
+/// specifier type
+typedef int           spec_t;
+
+/// Binary type
+typedef unsigned char bin_t;
+
+/// command type
 union cmd_t 
 {
     struct
@@ -37,15 +60,12 @@ union cmd_t
     unsigned char byte;
 };
 
-/// bin types
-typedef double        val64_t;
-typedef unsigned char val8_t;
+const spec_t ARG_ERRTYPE  = -1;
+const spec_t ARG_IMMCONST =  0;
+const spec_t ARG_REGISTER =  1;
 
-/// specifier type
-typedef int           spec_t;
-
-/// Binary type
-typedef unsigned char bin_t;
+const spec_t MEM_NOT_RAM =  0;
+const spec_t MEM_RAM     =  1;
 
 /// Capacity of binary line buffer
 const size_t BIN_LINE_CAP = 0x200;

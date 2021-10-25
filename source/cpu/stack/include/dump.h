@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-#ifdef DUMP
-
 #ifndef __USE_MINGW_ANSI_STDIO
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
@@ -20,6 +18,7 @@
  */
 void stack_dump_set_print(void (*print_func)(FILE* stream, const Elem_t* elem));
 
+#ifdef DUMP
 const char BAD_ALLOCATION[]    = "Allocation has failed\n";
 const char BAD_BUFFER[]        = "Buffer is corrupted\n";
 const char BAD_STACK_HASH[]    = "Bad stack hash (stack is corrupted)\n";
@@ -31,7 +30,7 @@ const char REDESTRUCTING[]     = "Trying to destroy already destroyed stack\n";
 const char DESTRUCTED[]        = "Stack is destructed\n";
 const char SIZE_OVER_CAP[]     = "Size is greater than capacity\n";
 const char CAP_OVER_SIZE[]     = "Capacity is greater than needed for current size\n";
-const char POP_EMPTY_STACK[]   = "Trying to pop from empty stack";
+const char POP_EMPTY_STACK[]   = "Trying to pop from empty stack\n";
 const char NULLPOINTER[]       = "Nullptr was passed\n";
 
 struct Stack;

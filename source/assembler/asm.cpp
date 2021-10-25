@@ -7,6 +7,7 @@
 #include "text/Text.h"
 #include "../args/args.h"
 #include "preprocessor.h"
+#include "preprocessor_list.h"
 #include "../log/log.h"
 #include "../binary/Binary.h"
 
@@ -42,7 +43,8 @@ int main(int argc, char* argv[])
     Binary bin = {};
     ASSERT(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size) == 0, ASM_BIN_FAIL);
 
-    L$(ASSERT(preprocessor(&bin, &txt) == 0, ASM_PARSE_FAIL);)
+    if(preprocessor(&bin, &txt) != 0)
+        log_err(infile_name);
 
     FILE* ostream = fopen(outfile_name, "wb");
     ASSERT(ostream, ASM_WRITE_FAIL);

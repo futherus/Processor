@@ -3,6 +3,7 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include "processing.h"
 #include "stack/include/Stack.h"
 #include "../log/log.h"
@@ -10,32 +11,66 @@
 static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 {
     cmd_t cmd = {};
-    ASSERT(binary_swrite(&cmd, bin, sizeof(cmd_t)) == 0, CPU_READCMD_FAIL);
+    binary_swrite(&cmd, bin, sizeof(cmd_t));
 
     *dst_cmd = cmd;
     
     return CPU_NOERR;
 }
 
-static cpu_err get_arg(arg_t* dst_arg, Binary* bin)
-{
-    arg_t arg = 0;
+// TODO: optimize to one switch
+#define get_arg()                                                       \
+    {                                                                   \
+        switch(cmd.bits.reg)                                            \
+        {                                                               \
+            case ARG_REGISTER:                                          \
+                binary_swrite(&cpu.reg_temp_8b, bin, sizeof(val8_t));   \
+                cpu.reg_ptr = &cpu.regs[cpu.reg_temp_8b];               \
+                break;                                                  \
+                                                                        \
+            case ARG_IMMCONST:                                          \
+                binary_swrite(&cpu.reg_temp_64b, bin, sizeof(val64_t)); \
+                cpu.reg_ptr = &cpu.reg_temp_64b;                        \
+                break;                                                  \
+                                                                        \
+            default:                                                    \
+                assert(0);                                              \
+        }                                                               \
+        switch(cmd.bits.mem)                                            \
+        {                                                               \
+            case MEM_RAM:                                               \
+                cpu.reg_ptr = &cpu.ram[(size_t) (*cpu.reg_ptr)];        \
+                break;                                                  \
+                                                                        \
+            case MEM_NOT_RAM:                                           \
+                break;                                                  \
+                                                                        \
+            default:                                                    \
+                assert(0);                                              \
+        }                                                               \
+    }                                                                   \
 
-    ASSERT(binary_swrite(&arg, bin, sizeof(arg_t)) == 0, CPU_READARG_FAIL);
+#define DEF_SYSCMD(TEXT, hash, W_ARG, CODE)                     \
+    case SYSCMD_##TEXT:                                         \
+        if(W_ARG)                                               \
+            get_arg();                                          \
+        CODE                                                    \
+        break;                                                  \
 
-    *dst_arg = arg;
-    
-    return CPU_NOERR;
-}
+#define DEF_CMD(TEXT, hash, N_ARGS, CODE)                       \
+    case CMD_##TEXT:                                            \
+        cpu.reg_d_sz = (N_ARGS);                                \
+        CODE                                                    \
+        break;                                                  \
 
-#define DEF_CMD(TEXT, n_args, CODE)    \
-    case CMD_##TEXT:                   \
-        CODE                           \
+
+#define wregs (cpu.regs)
+#define dregs (cpu.regs + 128)
 
 cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
 {
-    Stack stk = {};
-    stack_init(&stk, 0);
+    CPU cpu = {};
+    stack_init(&cpu.stk, 0);
 
     while(bin->ip != bin->sz)
     {
@@ -44,6 +79,8 @@ cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
 
         switch(cmd.bits.cmd)
         {
+            #include "../def_syscmd.inc"
+            
             #include "../def_cmd.inc"
             
             default:
@@ -53,8 +90,8 @@ cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
         }
     }
     
-    stack_dstr(&stk);
-
+    stack_dstr(&cpu.stk);
+    
     return CPU_NOERR;
 }  
 

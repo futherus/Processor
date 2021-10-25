@@ -13,6 +13,11 @@
 
 const char LOGFILE[] = "cpu_log.txt";
 
+void processor_print_elem(FILE* ostream, const val64_t* elem)
+{
+    fprintf(ostream, "%lg", *elem);
+}
+
 static int file_sz(const char filename[], ssize_t* sz)
 {
     struct stat buff = {};
@@ -20,7 +25,7 @@ static int file_sz(const char filename[], ssize_t* sz)
         return -1;
     
     *sz = buff.st_size;
-
+    
     return 0;
 }
 
@@ -34,7 +39,7 @@ int main(int argc, char* argv[])
         response_args(msg);
 
     ssize_t binfile_sz = 0;
-    L$(ASSERT(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);)
+    ASSERT(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);
     binfile_sz = binfile_sz / sizeof(bin_t);
 
     FILE* binstream = fopen(binfile_name, "rb");
@@ -43,14 +48,16 @@ int main(int argc, char* argv[])
     Binary bin = {};
     ASSERT(binary_init(&bin, binfile_sz) == 0, CPU_BIN_FAIL);
 
-    L$(ASSERT(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);)
+    ASSERT(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);
 
     ASSERT(fclose(binstream) == 0, CPU_READ_FAIL);
 
     FILE* istream = stdin;
     FILE* ostream = stdout;
 
-    L$(ASSERT(processing(&bin, istream, ostream) == 0, CPU_PROCESSING_FAIL);)
+    stack_dump_set_print(&processor_print_elem);
+
+    ASSERT(processing(&bin, istream, ostream) == 0, CPU_PROCESSING_FAIL);
 
     ASSERT(binary_dstr(&bin) == 0, CPU_BIN_FAIL);
 

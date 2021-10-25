@@ -9,7 +9,6 @@
 #include <ctype.h>
 
 #include "../hash.h"
-#include "../log/log.h"
 #include "preprocessor.h"
 #include "preprocessor_list.h"
 
@@ -31,14 +30,15 @@ Preprocessor_errstruct* preprocessor_errstruct()
         }                                                           \
     } while(0)                                                      \
 
-#define PREPROCESSOR_ASSERT_SETLINE(CONDITION, ERR, LINE)           \
+#define PREPROCESSOR_ASSERT_SETLINE(CONDITION, ERR, LINE, TXT)      \
     do                                                              \
     {                                                               \
         if(!(CONDITION))                                            \
         {                                                           \
             Preprocessor_errstruct* ptr = preprocessor_errstruct(); \
-            ptr->line = (LINE);                                     \
+            ptr->line   = (LINE);                                   \
             ptr->errnum = (ERR);                                    \
+            strcpy(ptr->txt, TXT);                                  \
             return (ERR);                                           \
         }                                                           \
     } while(0)                                                      \
@@ -55,6 +55,7 @@ Preprocessor_errstruct* preprocessor_errstruct()
         }                                                           \
     } while(0)                                                      \
 
+/////////////////////////////////////////////////////////////////////////////
 
 static void clean_whitespaces(char* txt, size_t* pos)
 {
@@ -72,6 +73,20 @@ static void wordlen(char* txt, size_t* pos, size_t* n_read)
         (*n_read)++;
 }
 
+#define DEF_SYSCMD(TXT, HASH, N_ARGS, code) \
+    case (HASH):                            \
+        expr->cmd.value_8b = SYSCMD_##TXT;  \
+        expr->cmd.n_args   = (N_ARGS);      \
+        expr->cmd.is_sys   = 1;             \
+        break;                              \
+
+#define DEF_CMD(TXT, HASH, N_ARGS, code)    \
+    case (HASH):                            \
+        expr->cmd.value_8b = CMD_##TXT;     \
+        expr->cmd.n_args   = (N_ARGS);      \
+        expr->cmd.is_sys   = 0;             \
+        break;                              \
+
 static preprocessor_err get_cmd(Expression* expr, char* txt, size_t* pos)
 {
     assert(expr && txt && pos);
@@ -82,17 +97,10 @@ static preprocessor_err get_cmd(Expression* expr, char* txt, size_t* pos)
 
     switch(expr->cmd.hash)
     {
-        case HASH_push:                   
-            expr->cmd.value_8b = EMBCMD_push; 
-            expr->cmd.n_args   = 1;
-            break;
-        case HASH_out:
-            expr->cmd.value_8b = CMD_out;
-            expr->cmd.n_args   = 0;
-            break;
-        //.
-        //.
-        //.
+        #include "../def_syscmd.inc"
+
+        #include "../def_cmd.inc"
+
         default:
             PREPROCESSOR_ASSERT_SETPOS(0, PREPROCESSOR_UNKNWN_CMD, *pos);
     }
@@ -101,7 +109,16 @@ static preprocessor_err get_cmd(Expression* expr, char* txt, size_t* pos)
 
     return PREPROCESSOR_NOERR;
 }
+#undef DEF_CMD
+#undef DEF_SYSCMD
 
+#define DEF_REG(TXT, HASH)                  \
+    case (HASH):                            \
+        CUR_LITER_.type     = ARG_REGISTER; \
+        CUR_LITER_.value_8b = REG_##TXT;    \
+        arg->literals_sz++;                 \
+        break;                              \
+        
 #define CUR_LITER_ (arg->literals[arg->literals_sz])
 static preprocessor_err get_arg(Argument* arg, char* txt, size_t* pos)
 {
@@ -111,6 +128,7 @@ static preprocessor_err get_arg(Argument* arg, char* txt, size_t* pos)
 
     clean_whitespaces(txt, pos);
 
+/////////////////////////////////////// Skips `pop [1+]` error ////////////////////////////////////
     if(txt[*pos] == '+' || txt[*pos] == '-')
     {
         if(CUR_LITER_.sign != 0) 
@@ -142,23 +160,7 @@ static preprocessor_err get_arg(Argument* arg, char* txt, size_t* pos)
 
         switch(hash)
         {
-            case HASH_rax:
-                CUR_LITER_.type     = ARG_REGISTER;
-                CUR_LITER_.value_8b = 1;
-                arg->literals_sz++;
-                break;
-
-            case HASH_rbx:
-                CUR_LITER_.type     = ARG_REGISTER;
-                CUR_LITER_.value_8b = 2;
-                arg->literals_sz++;
-                break;
-
-            case HASH_rcx:
-                CUR_LITER_.type     = ARG_REGISTER;
-                CUR_LITER_.value_8b = 3;
-                arg->literals_sz++;
-                break;
+            #include "../def_reg.inc"
 
             default:
                 PREPROCESSOR_ASSERT_SETPOS(0, PREPROCESSOR_UNKNWN_ARG, *pos);
@@ -171,7 +173,8 @@ static preprocessor_err get_arg(Argument* arg, char* txt, size_t* pos)
 
     return err;
 }
-#undef CUR_LITER
+#undef CUR_LITER_
+#undef DEF_REG
 
 static preprocessor_err verify_arg(Argument* arg)
 {
@@ -186,25 +189,36 @@ static preprocessor_err verify_arg(Argument* arg)
     return PREPROCESSOR_NOERR;
 }
 
+#define ARGS_ (expr->args)
+#define CMD_  (expr->cmd)
 static preprocessor_err verify_expr(Expression* expr)
 {
     assert(expr);
 
     preprocessor_err err = PREPROCESSOR_NOERR;
 
-    PREPROCESSOR_ASSERT(expr->cmd.n_args == expr->args_sz, PREPROCESSOR_INVALID_ARGS_NUM);
+    PREPROCESSOR_ASSERT(CMD_.n_args == expr->args_sz, PREPROCESSOR_INVALID_ARGS_NUM);
     
-    if(expr->cmd.value_8b == EMBCMD_pop)
-        PREPROCESSOR_ASSERT(expr->args[0].literals_sz == 1, PREPROCESSOR_LITS_FOR_POP); // EMBCMD_pop cannot evaluate args
+    if(CMD_.is_sys)
+    {
+        PREPROCESSOR_ASSERT(ARGS_[0].literals_sz <= 1, PREPROCESSOR_LITS_FOR_SYS); // System command cannot evaluate args
+        PREPROCESSOR_ASSERT(ARGS_[0].literals[0].sign == 0, PREPROCESSOR_SIGN_FOR_SYS);
+    }
     
+    if(CMD_.value_8b == SYSCMD_pop)
+        PREPROCESSOR_ASSERT(ARGS_[0].literals[0].type == ARG_REGISTER || ARGS_[0].memory == MEM_RAM,
+                            PREPROCESSOR_IMMCONST_FOR_POP); // Pop command can't access immense constant
+
     for(size_t arg_iter = 0; arg_iter < expr->args_sz; arg_iter++)
     {
-        err = verify_arg(&expr->args[arg_iter]);
+        err = verify_arg(&ARGS_[arg_iter]);
         PREPROCESSOR_ASSERT(!err, err);
     }
 
     return PREPROCESSOR_NOERR;
 }
+#undef ARGS_
+#undef CMD_
 
 static preprocessor_err get_expr(Expression* expr, char* txt)
 {
@@ -228,7 +242,7 @@ static preprocessor_err get_expr(Expression* expr, char* txt)
 
         if(txt[pos] == '[')
         {
-            expr->args[expr->args_sz].memory = MEMORY_RAM;
+            expr->args[expr->args_sz].memory = MEM_RAM;
             pos++;
         }
 
@@ -238,13 +252,11 @@ static preprocessor_err get_expr(Expression* expr, char* txt)
 
         clean_whitespaces(txt, &pos);
 
-        if(expr->args[expr->args_sz].memory == MEMORY_RAM)
+        if(expr->args[expr->args_sz].memory == MEM_RAM)
         {
             PREPROCESSOR_ASSERT_SETPOS(txt[pos] == ']', PREPROCESSOR_MISSING_PARENTHESIS, pos);
-            
             pos++;
         }
-
 
         expr->args_sz++;
         
@@ -254,7 +266,7 @@ static preprocessor_err get_expr(Expression* expr, char* txt)
 
         if(txt[pos] == '\0')
             break;
-        
+
         pos++;
         clean_whitespaces(txt, &pos);
 
@@ -268,6 +280,7 @@ static preprocessor_err get_expr(Expression* expr, char* txt)
     return PREPROCESSOR_NOERR;
 }
 
+/////////////////////////////////////////////////////////////////////////////
 
 #define PUT_CMD(code)                                                       \
     do                                                                      \
@@ -302,35 +315,35 @@ static preprocessor_err get_expr(Expression* expr, char* txt)
         }                                                                   \
     } while(0)                                                              \
 
-static void put_evaluate_arg(bin_t* dst_line, size_t* pos, Argument* arg)
+static void put_evaluate_arg(bin_t* dst_line, size_t* pos, Argument* arg, size_t* arg_iter)
 {
     Arg_literal zero_lit = {};
     zero_lit.type = ARG_IMMCONST;
     zero_lit.value_64b = 0.0;
 
-    PUT_CMD_WA(EMBCMD_push, MEMORY_NOT_RAM, zero_lit); // Zero for arg calculation
+    PUT_CMD_WA(SYSCMD_push, MEM_NOT_RAM, zero_lit); // Zero for arg calculation
     
     for(size_t lit_iter = 0; lit_iter < arg->literals_sz; lit_iter++)
     {
-        PUT_CMD_WA(EMBCMD_push, MEMORY_NOT_RAM, arg->literals[lit_iter]); // push literal
+        PUT_CMD_WA(SYSCMD_push, MEM_NOT_RAM, arg->literals[lit_iter]); // push literal
 
         if(arg->literals[lit_iter].sign == -1)
-            PUT_CMD(EMBCMD_sub); // - -> sub 
+            PUT_CMD(SYSCMD_sub); // - -> sub 
         else
-            PUT_CMD(EMBCMD_add); // + -> add
+            PUT_CMD(SYSCMD_add); // + -> add
     }
 
-    Arg_literal dax_lit = {};
-    dax_lit.type = ARG_REGISTER;
-    dax_lit.value_8b = REG_dax;
+    Arg_literal d$x_lit = {};
+    d$x_lit.type = ARG_REGISTER;
+    d$x_lit.value_8b = REG_dax + *arg_iter;
 
-    PUT_CMD_WA(EMBCMD_pop, MEMORY_NOT_RAM, dax_lit); // pop argument to dax (dark register)
+    PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lit); // pop argument to d$x (dark register)
 
-    if(arg->memory == MEMORY_RAM)  //if access to RAM
+    if(arg->memory == MEM_RAM)  //if access to RAM
     {
-        PUT_CMD_WA(EMBCMD_push, MEMORY_RAM, dax_lit); // push RAM[dax]
+        PUT_CMD_WA(SYSCMD_push, MEM_RAM, d$x_lit); // push RAM[d$x]
 
-        PUT_CMD_WA(EMBCMD_pop, MEMORY_NOT_RAM, dax_lit); // pop to dax
+        PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lit); // pop to d$x
     }
 }
 
@@ -342,22 +355,24 @@ static preprocessor_err put_expr(bin_t* dst_line, size_t* pos, Expression* expr)
     {
         PUT_CMD(expr->cmd.value_8b);
     }
-    else if(expr->cmd.value_8b == EMBCMD_pop) // EMBCMD_pop works with registers and memory directly, argument is one literal and can't be evaluated
+    else if(expr->cmd.is_sys) // Sys commands work with registers and memory directly, argument is one literal and can't be evaluated
     {
-        PUT_CMD_WA(EMBCMD_pop, expr->args[0].memory, expr->args[0].literals[0]);
+        PUT_CMD_WA(expr->cmd.value_8b, expr->args[0].memory, expr->args[0].literals[0]);
     }
     else
     {
         for(size_t arg_iter = 0; arg_iter < expr->args_sz; arg_iter++)
         {
-            put_evaluate_arg(dst_line, pos, &expr->args[arg_iter]); // evaluates argument, pushes it to dax
+            put_evaluate_arg(dst_line, pos, &expr->args[arg_iter], &arg_iter); // evaluates argument, pushes it to dax...dzx
         }
 
-        PUT_CMD(expr->cmd.value_8b); // implicitly gets argument from dax 
+        PUT_CMD(expr->cmd.value_8b); // implicitly gets argument from dax...dzx
     }
 
     return PREPROCESSOR_NOERR;
 }
+
+/////////////////////////////////////////////////////////////////////////////
 
 static preprocessor_err preprocess_line(bin_t* bin_line, size_t* bin_line_sz, char* txt_line)
 {
@@ -368,9 +383,8 @@ static preprocessor_err preprocess_line(bin_t* bin_line, size_t* bin_line_sz, ch
     preprocessor_err err = PREPROCESSOR_NOERR;
 
     err = get_expr(&expr, txt_line);
-    PREPROCESSOR_ASSERT(!err, err);
-
     list_expr(&expr, txt_line);
+    PREPROCESSOR_ASSERT(!err, err);
 
     put_expr(bin_line, bin_line_sz, &expr);
 
@@ -386,16 +400,13 @@ preprocessor_err preprocessor(Binary* bin, const Text* txt)
 
     for(size_t line = 0; line < n_line; line++)
     {
-        //DI$(line);
         size_t bin_line_sz = 0;
         bin_t bin_line[BIN_LINE_CAP] = {0};
 
         char* txt_line = txt->index_arr[line].begin;
 
         err = preprocess_line(bin_line, &bin_line_sz, txt_line);
-        PREPROCESSOR_ASSERT_SETLINE(!err, err, line);
-
-
+        PREPROCESSOR_ASSERT_SETLINE(!err, err, line, txt_line);
 
         list_line(bin_line, bin_line_sz, txt_line, line);
 
@@ -404,23 +415,3 @@ preprocessor_err preprocessor(Binary* bin, const Text* txt)
 
     return PREPROCESSOR_NOERR;
 }
-
-/*
-int test_function(char* txt)
-{
-    Expression expr = {};
-
-    preprocessor_err err = get_expr(&expr, txt);
-
-    list_expr(&expr, txt);
-
-    bin_t bin_line[BIN_LINE_CAP] = {};
-
-    size_t bin_line_sz = 0;
-
-    put_expr(&bin_line, &bin_line_sz, &expr);
-
-    return 0;
-}
-
-*/

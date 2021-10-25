@@ -5,39 +5,24 @@
 #include "../binary/Binary.h"
 #include "text/Text.h"
 
-const size_t ARGS_CAP = 0x8;
-const size_t LITS_CAP = 8;
+const size_t ARGS_CAP = 0x6;
+const size_t LITS_CAP = 0x6;
 
-const spec_t ARG_ERRTYPE  = -1;
-const spec_t ARG_IMMCONST =  0;
-const spec_t ARG_REGISTER =  1;
-
-const spec_t MEMORY_NOT_RAM =  0;
-const spec_t MEMORY_RAM   =  1;
-
-const int CMD_out = 2;  //
-
-const uint64_t HASH_push = 12441716782781469529ULL; //
-const uint64_t HASH_out  = 15613325803558276075ULL; //
-
-const uint64_t HASH_rax  = 15610255967092878490ULL; //
-const uint64_t HASH_rbx  = 15610254867581250391ULL; //
-const uint64_t HASH_rcx  = 15610253768069622020ULL; //
-
-const val8_t REG_dax = 255; //
+const val8_t REG_dax = 128; 
 
 struct Command
 {
     val8_t value_8b = 0;  ///->value8_b ?
 
-    uint64_t hash = 0;
-    size_t  n_args = 0;
+    spec_t   is_sys = 0;
+    uint64_t hash   = 0;
+    size_t   n_args = 0;
 };
 
 struct Arg_literal
 {
     val64_t value_64b = 0;
-    val8_t  value_8b = 0;
+    val8_t  value_8b  = 0;
 
     int    sign = 0;
     spec_t type = ARG_ERRTYPE;
@@ -46,9 +31,9 @@ struct Arg_literal
 struct Argument
 {
     Arg_literal literals[LITS_CAP] = {};
-    size_t literals_sz   =  0;
+    size_t literals_sz = 0;
 
-    spec_t memory = MEMORY_NOT_RAM;
+    spec_t memory = MEM_NOT_RAM;
 };
 
 struct Expression 
@@ -73,20 +58,22 @@ enum preprocessor_err
     PREPROCESSOR_INVALID_ARG         =  6,
     PREPROCESSOR_UNKNWN_ARG          =  7,
     PREPROCESSOR_INVALID_ARGS_NUM    =  8,
-    PREPROCESSOR_LITS_FOR_POP        =  9,
-    PREPROCESSOR_UNKNWN_CMD          = 10,
+    PREPROCESSOR_LITS_FOR_SYS        =  9,
+    PREPROCESSOR_SIGN_FOR_SYS        = 10,
+    PREPROCESSOR_IMMCONST_FOR_POP    = 11,
+    PREPROCESSOR_UNKNWN_CMD          = 12,
 };
 
 struct Preprocessor_errstruct
 {
     size_t line = 0;
     size_t pos = 0;
+    char txt[TXT_CMD_CAP] = "";
 
     preprocessor_err errnum = PREPROCESSOR_NOERR;
 };
 
 Preprocessor_errstruct* preprocessor_errstruct();
-
 
 preprocessor_err preprocessor(Binary* bin, const Text* txt);
 
