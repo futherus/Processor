@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+
 #include "processing.h"
+#include "cpu_dump.h"
 #include "stack/include/Stack.h"
-#include "../log/log.h"
 
 static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 {
@@ -24,13 +26,13 @@ static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
         switch(cmd.bits.reg)                                            \
         {                                                               \
             case ARG_REGISTER:                                          \
-                binary_swrite(&cpu.reg_temp_8b, bin, sizeof(val8_t));   \
-                cpu.reg_ptr = &cpu.regs[cpu.reg_temp_8b];               \
+                binary_swrite(&cpu->reg_temp_8b, bin, sizeof(val8_t));  \
+                cpu->reg_ptr = &cpu->regs[cpu->reg_temp_8b];            \
                 break;                                                  \
                                                                         \
-            case ARG_IMMCONST:                                          \
-                binary_swrite(&cpu.reg_temp_64b, bin, sizeof(val64_t)); \
-                cpu.reg_ptr = &cpu.reg_temp_64b;                        \
+            case ARG_NOTREGISTER:                                       \
+                binary_swrite(&cpu->reg_temp_64b, bin, sizeof(val64_t));\
+                cpu->reg_ptr = &cpu->reg_temp_64b;                      \
                 break;                                                  \
                                                                         \
             default:                                                    \
@@ -39,7 +41,7 @@ static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
         switch(cmd.bits.mem)                                            \
         {                                                               \
             case MEM_RAM:                                               \
-                cpu.reg_ptr = &cpu.ram[(size_t) (*cpu.reg_ptr)];        \
+                cpu->reg_ptr = &cpu->ram[(size_t) (*cpu->reg_ptr)];     \
                 break;                                                  \
                                                                         \
             case MEM_NOT_RAM:                                           \
@@ -59,18 +61,16 @@ static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 
 #define DEF_CMD(TEXT, hash, N_ARGS, CODE)                       \
     case CMD_##TEXT:                                            \
-        cpu.reg_d_sz = (N_ARGS);                                \
         CODE                                                    \
         break;                                                  \
 
+#define dargs (cpu->regs + REG_dax)
+#define dtemp (cpu->regs + REGS_CAP - 4)
+#define wregs (cpu->regs)
 
-#define wregs (cpu.regs)
-#define dregs (cpu.regs + 128)
-
-cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
+cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
 {
-    CPU cpu = {};
-    stack_init(&cpu.stk, 0);
+    assert(cpu && bin);
 
     while(bin->ip != bin->sz)
     {
@@ -85,13 +85,13 @@ cpu_err processing(Binary* bin, FILE* istream, FILE* ostream)
             
             default:
             {
-                ASSERT(0, CPU_UNKNWN_CMD);
+                return CPU_UNKNWN_CMD;
             }
         }
+
+        cpu_dump(cpu);
     }
-    
-    stack_dstr(&cpu.stk);
-    
+        
     return CPU_NOERR;
 }  
 

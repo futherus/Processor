@@ -5,14 +5,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "preprocessor_list.h"
+#include "parser_list.h"
+#include "../dumpsystem/dumpsystem.h"
 
-static FILE* PREPROCESSOR_STREAM = nullptr;
-static FILE* BINLINE_STREAM      = nullptr;
+static FILE* PARSER_STREAM  = nullptr;
+static FILE* BINLINE_STREAM = nullptr;
 
 const static char MISSING_SIGN[]        = "sign before literal is missing";
 const static char SIGN_DUPLICATE[]      = "sign of literal is duplicated";
-const static char MISSING_PARENTHESIS[] = "closing parenthesis is missing";
+const static char MISSING_PARENTHESES[] = "closing parenthesis is missing";
 const static char TRAILING_SYMBOLS[]    = "trailing symbols in argument";
 const static char TRAILING_COMMA[]      = "trailing comma";
 const static char INVALID_ARG[]         = "argument is invalid";
@@ -22,86 +23,74 @@ const static char LITS_FOR_SYS[]        = "system command can get only one-liter
 const static char SIGN_FOR_SYS[]        = "system command cannot have signed argument";
 const static char IMMCONST_FOR_POP[]    = "`pop` command cannot access number";
 const static char UNKNWN_CMD[]          = "unknown command";
+const static char LABEL_REDECL[]        = "label redeclaration";
+const static char LABEL_NODECL[]        = "no label declaration";
 
-static void close_liststream_()
+void parser_dump_init()
 {
-    if(fclose(PREPROCESSOR_STREAM) != 0 || fclose(BINLINE_STREAM) != 0)
-        fprintf(stderr, "Files for listing cannot be closed %s", strerror(errno));
+    BINLINE_STREAM = dumpsystem_get_stream(binline_list);
+    PARSER_STREAM  = dumpsystem_get_stream(expression_list);
 }
 
-static int list_stream_()
-{
-    static int first_call = 1;
+#define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__)
 
-    if(first_call)
-    {
-        first_call = 0;
-
-        BINLINE_STREAM      = fopen(BINLINE_LISTFILE,      "w");
-        PREPROCESSOR_STREAM = fopen(PREPROCESSOR_LISTFILE, "w");
-        
-        if(BINLINE_STREAM && PREPROCESSOR_STREAM)
-            atexit(&close_liststream_);
-        else
-        {
-            fprintf(stderr, "Cannot open file for listing %s", strerror(errno));
-            return -1;
-        }
-    }
-
-    return 0;
-}
-
-#define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__) 
-
-////////////////////////    Error logging   ////////////////////////
-void log_err(const char infile_name[])
+////////////////////////   Error logging   ////////////////////////
+void log_err()
 {
     FILE* stream = stderr;
 
-    Preprocessor_errstruct* ptr = preprocessor_errstruct();
-    PRINT("\n" "%s:%llu:%llu: ", infile_name, ptr->line + 1, ptr->pos);
+    Parser_errstruct* ptr = parser_errstruct();
+    PRINT("\n" "%s:%llu:%llu: ", ptr->infile, ptr->line + 1, ptr->pos);
     PRINT("error: ");
     
     switch(ptr->errnum)
     {
-        case PREPROCESSOR_MISSING_SIGN:
+        case PARSER_MISSING_SIGN:
             PRINT("%s\n", MISSING_SIGN);
             break;
-        case PREPROCESSOR_SIGN_DUPLICATE:
+        case PARSER_SIGN_DUPLICATE:
             PRINT("%s\n", SIGN_DUPLICATE);
             break;
-        case PREPROCESSOR_MISSING_PARENTHESIS:
-            PRINT("%s\n", MISSING_PARENTHESIS);
+        case PARSER_MISSING_PARENTHESES:
+            PRINT("%s\n", MISSING_PARENTHESES);
             break;
-        case PREPROCESSOR_TRAILING_SYMBOLS:
+        case PARSER_TRAILING_SYMBOLS:
             PRINT("%s\n", TRAILING_SYMBOLS);
             break;
-        case PREPROCESSOR_TRAILING_COMMA:
+        case PARSER_TRAILING_COMMA:
             PRINT("%s\n", TRAILING_COMMA);
             break;
-        case PREPROCESSOR_INVALID_ARG:
+        case PARSER_INVALID_ARG:
             PRINT("%s\n", INVALID_ARG);
             break;
-        case PREPROCESSOR_UNKNWN_ARG:
+        case PARSER_UNKNWN_ARG:
             PRINT("%s\n", UNKNWN_ARG);
             break;
-        case PREPROCESSOR_INVALID_ARGS_NUM:
+        case PARSER_INVALID_ARGS_NUM:
             PRINT("%s\n", INVALID_ARGS_NUM);
             break;
-        case PREPROCESSOR_LITS_FOR_SYS:
+        case PARSER_LITS_FOR_SYS:
             PRINT("%s\n", LITS_FOR_SYS);
             break;
-        case PREPROCESSOR_SIGN_FOR_SYS:
+        case PARSER_SIGN_FOR_SYS:
             PRINT("%s\n", SIGN_FOR_SYS);
             break;
-        case PREPROCESSOR_UNKNWN_CMD:
+        case PARSER_UNKNWN_CMD:
             PRINT("%s\n", UNKNWN_CMD);
             break;
-        case PREPROCESSOR_IMMCONST_FOR_POP:
-            PRINT("%s\n", IMMCONST_FOR_POP);
+//        case PARSER_POP_ARG:
+//            PRINT("%s\n", IMMCONST_FOR_POP);
+//            break;
+//        case PARSER_JMP_ARG:
+//            PRINT("%s\n", IMMCONST_FOR_POP);
+//            break;
+        case PARSER_LABEL_REDECL:
+            PRINT("%s\n", LABEL_REDECL);
             break;
-        case PREPROCESSOR_NOERR:
+        case PARSER_LABEL_NODECL:
+            PRINT("%s\n", LABEL_NODECL);
+            break;
+        case PARSER_NOERR:
             /* fallthrough */
         default:
             PRINT("Error type was not set\n");
@@ -113,7 +102,6 @@ void log_err(const char infile_name[])
 ////////////////////////    Line listing    ////////////////////////
 void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 {
-    list_stream_();
     static int first_call = 1;
     FILE* stream = BINLINE_STREAM;
     if(!stream)
@@ -151,57 +139,76 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 //////////////////////// Expression listing ////////////////////////
 static void list_cmd(Command* cmd, FILE* stream)
 {
-    PRINT("    Cmd hash:   %llu\n", cmd->hash);
-    PRINT("    Cmd value:  %u\n",   cmd->value_8b);
-    PRINT("    Cmd n_args: %llu\n", cmd->n_args);
+    PRINT("    value:  %u\n",   cmd->code);
+    PRINT("    is_sys  %d\n",   cmd->is_sys);
+    PRINT("    hash:   %llu\n", cmd->hash);
+    PRINT("    n_args: %llu\n", cmd->n_args);
 }
 
-static void list_lit(Arg_literal* lit, FILE* stream)
+static void list_lex(Lexem* lex, FILE* stream)
 {
-    PRINT("          value_64b: %lg\n", lit->value_64b);
-    PRINT("          value_8b:  %u\n",  lit->value_8b);
-    PRINT("          sign:      %d\n",  lit->sign);
-    PRINT("          type:      %d\n",  lit->type);
+    PRINT("          type:           %u\n",   lex->type);
+    PRINT("          value (double): %lg\n",  lex->value.num);
+    PRINT("          pos:            %llu\n", lex->pos);
 }
 
 static void list_arg(Argument* arg, FILE* stream)
 {
     PRINT("      isRAM:  %d\n",   arg->memory);
-    PRINT("      lit_sz: %llu\n", arg->literals_sz);
+    PRINT("      lit_sz: %llu\n", arg->lexs_sz);
 
     PRINT("      Literals:\n");
     PRINT("      {\n");
-    for(size_t lit_iter = 0; lit_iter < arg->literals_sz; lit_iter++)
+    for(size_t lit_iter = 0; lit_iter < arg->lexs_sz; lit_iter++)
     {
         PRINT("        Literal #%llu\n", lit_iter);
-        list_lit(&arg->literals[lit_iter], stream);
+        list_lex(&arg->lexs[lit_iter], stream);
     }
     PRINT("      }\n");
 }
 
-void list_expr(Expression* expr, char* txt)
+void list_statement(Statement* stment, char* txt)
 {
-    list_stream_();
-    FILE* stream = PREPROCESSOR_STREAM;
+    FILE* stream = PARSER_STREAM;
     if(!stream)
         return;
 
-    PRINT("Expression\n");
+    PRINT("Statement\n");
     
     PRINT("  Txt code: `%s`\n", txt);
     PRINT("  Command:\n");
-    list_cmd(&expr->cmd, stream);
+    list_cmd(&stment->cmd, stream);
 
-    PRINT("  args_sz: %llu\n", expr->args_sz);
+    PRINT("  args_sz: %llu\n", stment->args_sz);
 
     PRINT("  Arguments:\n");
     PRINT("  {\n");
-    for(size_t arg_iter = 0; arg_iter < expr->args_sz; arg_iter++)
+    for(size_t arg_iter = 0; arg_iter < stment->args_sz; arg_iter++)
     {
         PRINT("    Argument #%llu\n", arg_iter);
-        list_arg(&expr->args[arg_iter], stream);
+        list_arg(&stment->args[arg_iter], stream);
     }
     PRINT("  }\n\n");
+
+    fflush(stream);
+}
+
+////////////////////////  Labels listing  ////////////////////////
+void list_labels(Labels_array* lbl_arr)
+{
+    FILE* stream = PARSER_STREAM;
+    if(!stream)
+        return;
+    
+    PRINT("Labels:\n");
+    PRINT("{\n");
+    for(size_t lbl_iter = 0; lbl_iter < lbl_arr->labels_sz; lbl_iter++)
+    {
+        PRINT("  Label:\n");
+        PRINT("    ip:   %llu\n", lbl_arr->labels[lbl_iter].ip);
+        PRINT("    hash: %llu\n", lbl_arr->labels[lbl_iter].hash);
+    }
+    PRINT("}\n");
 
     fflush(stream);
 }

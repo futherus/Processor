@@ -5,8 +5,8 @@
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
 #include <stdio.h>
-
 #include <stdint.h>
+
 #include "../hash.h"
 
 //////////////////////////////////////////////
@@ -37,6 +37,8 @@ enum reg_bin_code
 #undef DEF_REG
 /////////////////////////////////////////////
 
+const int REG_dax = 0x20;
+
 /// bin types
 typedef double        val64_t;
 typedef unsigned char val8_t;
@@ -60,9 +62,8 @@ union cmd_t
     unsigned char byte;
 };
 
-const spec_t ARG_ERRTYPE  = -1;
-const spec_t ARG_IMMCONST =  0;
-const spec_t ARG_REGISTER =  1;
+const spec_t ARG_NOTREGISTER =  0;
+const spec_t ARG_REGISTER    =  1;
 
 const spec_t MEM_NOT_RAM =  0;
 const spec_t MEM_RAM     =  1;

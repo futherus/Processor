@@ -9,14 +9,10 @@
 #include <string.h>
 #include <assert.h>
 
-static void (*PRINT_ELEM)(FILE*, const Elem_t*) = nullptr;
-
-void stack_dump_set_print(void (*print_func)(FILE*, const Elem_t*))
-{
-    PRINT_ELEM = print_func;
-}
-
 #ifdef DUMP
+
+static FILE* DUMP_STREAM = nullptr;
+static void (*PRINT_ELEM)(FILE*, const Elem_t*) = nullptr;
 
 //WARNING: not checked against overflow
 const size_t ERR_MSG_SZ = 8192;
@@ -74,40 +70,6 @@ static void set_message_(char err_msg[], Stack_err err)
     #define END_BUF_CAN_ (*((guard_t*) (BUF_ + CAP_)))
 #endif // CANARY
 
-static void close_logfile_();
-
-static FILE* open_logfile_(const char logfile[])  ///remove bufferization
-{
-    static int first_call = 1;
-    static FILE* logstream = stderr;
-    
-    if(first_call)
-    {
-        logstream = fopen(logfile, "w");
-        first_call = 0;
-
-        if(!logstream)
-        {
-            perror("Can't open log file\n");
-
-            logstream = stderr;
-        }
-
-        atexit(&close_logfile_);
-    }
-
-    return logstream;
-}
-
-static void close_logfile_()
-{
-    FILE* temp_stream = open_logfile_(STACK_LOGFILE);
-
-    if(temp_stream != stderr)
-        if(fclose(temp_stream) != 0)
-            perror("Stack log file can't be succesfully closed");
-}
-
 void dump_(const Stack* const stk,  Stack_err err, Stack_dump_lvl level, const char msg[],
            const char func[], const char file[], int line)
 {
@@ -117,8 +79,10 @@ void dump_(const Stack* const stk,  Stack_err err, Stack_dump_lvl level, const c
     if(level == Stack_dump_lvl::ONLYERR)
         return;
 
-    FILE* logstream = open_logfile_(STACK_LOGFILE);
-    
+    FILE* logstream = DUMP_STREAM;
+    if(!logstream)
+        return;
+        
     if(msg[0])
     {
         fprintf(logstream, "%s", msg);
@@ -213,6 +177,40 @@ void dump_(const Stack* const stk,  Stack_err err, Stack_dump_lvl level, const c
     fflush(logstream);
 }
 
+static void close_dumpfile_()
+{
+    if(fclose(DUMP_STREAM) != 0)
+        perror("Stack dump file can't be succesfully closed");
+}
+
+void stack_dump_init(FILE* dumpstream, void (*print_func)(FILE*, const Elem_t*))
+{
+    if(print_func)
+        PRINT_ELEM = print_func;
+
+    if(dumpstream)
+    {
+        DUMP_STREAM = dumpstream;
+        return;
+    }
+
+    if(STACK_DUMPFILE[0] != 0)
+    {
+        DUMP_STREAM = fopen(STACK_DUMPFILE, "w");
+
+        if(DUMP_STREAM)
+        {
+            atexit(&close_dumpfile_);
+            return;
+        }
+    }
+
+    perror("Can't open dump file");
+    DUMP_STREAM = stderr;
+
+    return;
+}
+
 Stack_err stack_dump_(const Stack* const stk, const char msg[],
                       const char func[], const char file[], int line)
 {
@@ -243,5 +241,12 @@ Stack_err stack_dump_(const Stack* const stk, const char msg[],
 #undef SZ_
 #undef PRESET_CAP_
 #undef CAP_
+
+#else // DUMP
+
+stack_dump_init(FILE*, void(*print_func)(FILE, const Elem_t*))
+{
+    void(0);
+}
 
 #endif // DUMP

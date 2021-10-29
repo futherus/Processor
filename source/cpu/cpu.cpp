@@ -9,14 +9,14 @@
 #include "stack/include/Stack.h"
 #include "../binary/Binary.h"
 #include "../args/args.h"
-#include "../log/log.h"
+#include "cpu_dump.h"
 
-const char LOGFILE[] = "cpu_log.txt";
-
-void processor_print_elem(FILE* ostream, const val64_t* elem)
-{
-    fprintf(ostream, "%lg", *elem);
-}
+#define A$(condition, err)                      \
+    if(!(condition))                            \
+    {                                           \
+        fprintf(stderr, "Error: %s", #err);     \
+        return (err);                           \
+    }                                           \
 
 static int file_sz(const char filename[], ssize_t* sz)
 {
@@ -31,35 +31,41 @@ static int file_sz(const char filename[], ssize_t* sz)
 
 int main(int argc, char* argv[])
 {
-    char binfile_name[MAX_FILENAME_SIZE] = "";
-    char outfile_name[MAX_FILENAME_SIZE] = "";  /* not used */
+    char binfile_name[FILENAME_MAX] = "";
 
-    args_msg msg = process_args(argc, argv, binfile_name, outfile_name); 
+    args_msg msg = process_args(argc, argv, binfile_name);
     if(msg)
+    {
         response_args(msg);
+        return msg;
+    }
 
+    cpu_dump_init();
+    
     ssize_t binfile_sz = 0;
-    ASSERT(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);
-    binfile_sz = binfile_sz / sizeof(bin_t);
+    A$(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);
 
     FILE* binstream = fopen(binfile_name, "rb");
-    ASSERT(binstream, CPU_READ_FAIL);
+    A$(binstream, CPU_READ_FAIL);
+
+    CPU cpu = {};
+    stack_init(&cpu.stk, 0);
 
     Binary bin = {};
-    ASSERT(binary_init(&bin, binfile_sz) == 0, CPU_BIN_FAIL);
 
-    ASSERT(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);
+    A$(binary_init(&bin, binfile_sz) == 0, CPU_BIN_FAIL);
 
-    ASSERT(fclose(binstream) == 0, CPU_READ_FAIL);
+    A$(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);
+
+    A$(fclose(binstream) == 0, CPU_READ_FAIL);
 
     FILE* istream = stdin;
     FILE* ostream = stdout;
 
-    stack_dump_set_print(&processor_print_elem);
+    A$(processing(&bin, &cpu, istream, ostream) == 0, CPU_PROCESSING_FAIL);
 
-    ASSERT(processing(&bin, istream, ostream) == 0, CPU_PROCESSING_FAIL);
-
-    ASSERT(binary_dstr(&bin) == 0, CPU_BIN_FAIL);
+    stack_dstr(&cpu.stk);
+    A$(binary_dstr(&bin) == 0, CPU_BIN_FAIL);
 
     return 0;
 }

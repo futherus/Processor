@@ -1,2 +1,0 @@
-main                ||  39|| ASSERT(text_create(&txt, infile_name) == 0, ASM_READ_FAIL);                                || D:\Projects\Processor\source\assembler\asm.cpp                         || Oct 26 2021 02:45:46
-main                ||  57|| ASSERT(binary_dstr(&bin) == 0, ASM_BIN_FAIL);                                              || D:\Projects\Processor\source\assembler\asm.cpp                         || Oct 26 2021 02:45:46

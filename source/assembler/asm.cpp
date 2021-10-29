@@ -6,12 +6,9 @@
 #include <string.h>
 #include "text/Text.h"
 #include "../args/args.h"
-#include "preprocessor.h"
-#include "preprocessor_list.h"
-#include "../log/log.h"
+#include "parser.h"
 #include "../binary/Binary.h"
-
-const char LOGFILE[] = "asm_logs/asm_log.txt";
+#include "../jumps.h"
 
 enum asm_err
 {
@@ -25,8 +22,8 @@ enum asm_err
 
 int main(int argc, char* argv[])
 {
-    char infile_name [MAX_FILENAME_SIZE] = "";
-    char outfile_name[MAX_FILENAME_SIZE] = "";
+    char infile_name [FILENAME_MAX] = "";
+    char outfile_name[FILENAME_MAX] = "";
 
     args_msg msg = process_args(argc, argv, infile_name, outfile_name);
     if(msg)
@@ -36,25 +33,33 @@ int main(int argc, char* argv[])
     }
 
     Text txt = {};
-    L$(ASSERT(text_create(&txt, infile_name) == 0, ASM_READ_FAIL);)
+    Binary bin = {};
+    FILE* ostream = nullptr;
+
+TRY__    
+    CHECK__(text_create(&txt, infile_name), ASM_READ_FAIL);
 
     //text_clean(txt, ';'); // function cleans all after delimiter
 
-    Binary bin = {};
-    ASSERT(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size) == 0, ASM_BIN_FAIL);
+    CHECK__(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size), ASM_BIN_FAIL);
 
-    if(preprocessor(&bin, &txt) != 0)
-        log_err(infile_name);
+    parser(&bin, &txt, infile_name);
+    CHECK__(parser_errstruct()->errnum, ASM_PARSE_FAIL);
 
-    FILE* ostream = fopen(outfile_name, "wb");
-    ASSERT(ostream, ASM_WRITE_FAIL);
+    ostream = fopen(outfile_name, "wb");
+    CHECK__(ostream == nullptr, ASM_WRITE_FAIL);
     
-    ASSERT(binary_fwrite(ostream, &bin, bin.sz) == 0, ASM_WRITE_FAIL);
+    CHECK__(binary_fwrite(ostream, &bin, bin.sz), ASM_WRITE_FAIL);
 
-    ASSERT(fclose(ostream) == 0, ASM_WRITE_FAIL);
-    
+CATCH__
+    printf("Error in asm.cpp");
+FINALLY__
+    printf("No error in asm.cpp");
+    fclose(ostream);
     text_destroy(&txt);
-    L$(ASSERT(binary_dstr(&bin) == 0, ASM_BIN_FAIL);)
+    binary_dstr(&bin);
 
-    return ASM_NOERR;
+    return ERROR__;
+
+ENDTRY__
 }

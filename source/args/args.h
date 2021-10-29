@@ -6,9 +6,6 @@
 #endif
 #include <stdio.h>
 
-const size_t MAX_FILENAME_SIZE = 0x100;
-const size_t MAX_COMMAND_SIZE  = 0x100;
-
 enum args_msg
 {
     ARGS_NOMSG           = 0,  /// no message
@@ -18,7 +15,6 @@ enum args_msg
     ARGS_OPT_OVRWRT      = 4,  /// options overwrite
     ARGS_NO_IFL_NAME     = 5,  /// no input file name
     ARGS_NO_OFL_NAME     = 6,  /// no output file name
-    ARGS_CMD_OVRFLW      = 7,  /// command overflow
     ARGS_FLNAME_OVRFLW   = 8,  /// filename overflow
     ARGS_BAD_CMD         = 9,  /// bad input for command
     ARGS_UNEXPCTD_ERR    = 10, ///     
@@ -31,15 +27,13 @@ const char HELP[]              = "-h, --help             reference\n"
 const char NOTE[]              = "(program ignores other options if -h entered)\n";
 const char NO_OPTIONS[]        = "Error: enter options (-h to open reference)\n";
 const char OPTION_OVERWRITE[]  = "Error: option overwrite\n";
-const char NO_IFILE_NAME[]     = "Error: enter input file name";
-const char NO_OFILE_NAME[]     = "Error: enter output file name";
-const char COMMAND_OVERFLOW[]  = "Error: option is too long\n";
+const char NO_IFILE_NAME[]     = "Error: enter source file name\n";
+const char NO_OFILE_NAME[]     = "Error: enter destination file name\n";
 const char FILENAME_OVERFLOW[] = "Error: filename is too long\n";
 const char BAD_COMMAND[]       = "Error: bad command\n";
 const char BAD_INPUT_FILE[]    = "Error: cannot open input file\n";
 const char BAD_OUTPUT_FILE[]   = "Error: cannot open output file\n";
 const char UNEXPECTED_ERROR[]  = "UNEXPECTED ERROR\n";
-
 
 /** \brief Prints message corresponding to param
 
@@ -57,6 +51,6 @@ void response_args(args_msg param, FILE* const ostream = stderr);
 
     \return ARGS_NOMSG, args_msg with error otherwise
 */
-args_msg process_args(int argc, char* argv[], char infile_name[], char outfile_name[]);
+args_msg process_args(int argc, char* argv[], char infile_name[] = nullptr, char outfile_name[] = nullptr);
 
 #endif // ARGS_H

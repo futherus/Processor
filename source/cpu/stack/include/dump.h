@@ -12,11 +12,11 @@
 #include <stdio.h>
 
 /** \brief Sets function for printing elements in dump
- * 
- *  \param stream [in] FILE* pointer
- *  \param elem   [in] Pointer to elem to be printed
+ *  
+ *  \param dumpstream Stream for dump (if 0 passed sets stream with STACK_DUMPFILE)
+ *  \param print_func Function printing Elem_t to FILE (if 0 passed elements won't be printed)
  */
-void stack_dump_set_print(void (*print_func)(FILE* stream, const Elem_t* elem));
+void stack_dump_init(FILE* dumpstream, void (*print_func)(FILE*, const Elem_t*));
 
 #ifdef DUMP
 const char BAD_ALLOCATION[]    = "Allocation has failed\n";
@@ -42,7 +42,6 @@ enum Stack_dump_lvl
     BRIEF    = 1, ///< dumps one-line dump
     DETAILED = 2, ///< dumps all information about stack condition
 };
-
 
 void dump_(const Stack* const stk, Stack_err err, Stack_dump_lvl level, const char msg[],
            const char func[], const char file[], int line);

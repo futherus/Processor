@@ -9,8 +9,8 @@
 
                 typedef double Elem_t;
 
-                /// Path to file for logs
-                const char STACK_LOGFILE[] = "stack_log.txt";
+                /// Path to file for logs (can be replaced using stack_dump_set_stream)
+                const char STACK_DUMPFILE[] = "";
 
                 /// \brief Turn on protection for stack
                 #define PROTECT

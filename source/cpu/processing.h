@@ -4,7 +4,7 @@
 #include "../binary/Binary.h"
 #include "stack/include/Stack.h"
 
-const size_t REGS_CAP = 0x100; // dax number is 255! Be aware of SEGFAULT
+const size_t REGS_CAP = 0x40; // dax number is 32! Be aware of SEGFAULT
 const size_t RAM_CAP  = 0x100;
 
 struct CPU 
@@ -18,7 +18,7 @@ struct CPU
     val64_t* reg_ptr      = 0; ///< register with pointer to argument (one-literal)
     val8_t   reg_temp_8b  = 0; ///< register with 8  bits argument (one-literal, register)
     val64_t  reg_temp_64b = 0; ///< register with 64 bits argument (one-literal, immconst)
-    size_t   reg_d_sz     = 0; ///< register with amount of used d*x registers (evaluated arguments)
+    size_t   reg_sz       = 0; ///< register with size of stack (relative to last 'call')
 };
 
 enum cpu_err
@@ -32,6 +32,6 @@ enum cpu_err
     CPU_PROCESSING_FAIL,
 };
 
-cpu_err processing(Binary* bin, FILE* istream, FILE* ostream);
+cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream);
 
 #endif // CPU_H

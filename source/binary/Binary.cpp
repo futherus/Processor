@@ -1,8 +1,10 @@
-#include "Binary.h"
-#include "../log/log.h"
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+
+#include "Binary.h"
+
+#define ASSERT(condition, err)  assert((condition))
 
 Binary_err binary_init(Binary* bin, ssize_t cap)
 {
@@ -79,9 +81,9 @@ Binary_err binary_fwrite(FILE* ostream, Binary* bin, size_t count)
 
 Binary_err binary_dstr(Binary* bin)
 {
-    ASSERT(bin, BIN_NULLPTR);
-    ASSERT(bin->buffer, BIN_NULL_BUF);
-
+    if(!bin)
+        return BIN_NULLPTR;
+        
     free(bin->buffer);
 
     return BIN_NOERR;
