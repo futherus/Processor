@@ -10,6 +10,7 @@
 #include "../binary/Binary.h"
 #include "../args/args.h"
 #include "cpu_dump.h"
+#include "../cpu_time.h"
 
 #define A$(condition, err)                      \
     if(!(condition))                            \
@@ -62,7 +63,13 @@ int main(int argc, char* argv[])
     FILE* istream = stdin;
     FILE* ostream = stdout;
 
+    double begin_time = get_cpu_time();
+
     A$(processing(&bin, &cpu, istream, ostream) == 0, CPU_PROCESSING_FAIL);
+
+    double end_time = get_cpu_time();
+
+    fprintf(stderr, "Execution time: %lg s", end_time - begin_time);
 
     stack_dstr(&cpu.stk);
     A$(binary_dstr(&bin) == 0, CPU_BIN_FAIL);

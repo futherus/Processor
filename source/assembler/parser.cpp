@@ -490,6 +490,7 @@ static parser_err put_statement(bin_t* dst_line, size_t* pos, Statement* stment)
     {
         PUT_CMD(stment->cmd.code);
     }
+
     else if(stment->cmd.is_sys) // Sys commands work with registers and memory directly, argument is one literal and can't be evaluated
     {
         PUT_CMD_WA(stment->cmd.code, stment->args[0].memory, stment->args[0].lexs[0]);
@@ -576,7 +577,7 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
 
             if(ITERATION == 2)
             {
-                list_line(bin_line, bin_line_sz, txt_line, line);
+                list_line(bin_line, bin_line_sz, txt_line, line, ip);
 
                 binary_sread(bin, bin_line, bin_line_sz);
             }
@@ -588,5 +589,3 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
     
     return save_err;
 }
-
-

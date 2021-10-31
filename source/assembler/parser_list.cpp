@@ -100,16 +100,18 @@ void log_err()
 }
 
 ////////////////////////    Line listing    ////////////////////////
-void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
+void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line, size_t next_ip)
 {
     static int first_call = 1;
     FILE* stream = BINLINE_STREAM;
     if(!stream)
         return;
 
+    static size_t ip = 0;
+
     if(first_call)
     {
-        PRINT("|Line||Command----------------|");
+        PRINT("|Line||Command----------------||-IP-|");
         for(int addr = 0; addr < 50; addr++)
         {
             if(addr % 8 == 0)
@@ -124,6 +126,8 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
 
     PRINT("|%4llu|", line);
     PRINT("|%-23s|", txt_line);
+    PRINT("|%4llu|", ip);
+
     for(size_t iter = 0; iter < bin_line_sz; iter++)
     {
         if(iter % 8 == 0)
@@ -132,6 +136,8 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line)
         PRINT("%02hx ", bin_line[iter]);
     }
     PRINT("\n");
+
+    ip = next_ip;
 
     fflush(stream);
 }

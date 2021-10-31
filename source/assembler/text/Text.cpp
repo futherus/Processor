@@ -67,7 +67,7 @@ static Text_err create_index_arr(Index** dst_index_arr, size_t* dst_index_arr_si
 
     size_t iter     = 0;
     size_t line_num = 0;
-    bool nline_flag = 0;
+    bool nline_flag = 1;
 
     while(true)
     {

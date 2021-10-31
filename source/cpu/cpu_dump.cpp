@@ -27,15 +27,20 @@ void cpu_dump_init()
 
 #define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__) 
 
-void cpu_dump(CPU* cpu)
+void cpu_dump(CPU* cpu, size_t* ip)
 {
     FILE* stream = CPU_STREAM;
     if(!stream)
         return;
+    PRINT("\n----------------------------------------------------------------------------------------\n");
+    PRINT("CPU dump\n");
+    PRINT("INSTRUCTION POINTER: %llu\n", *ip);
 
-    PRINT("\nCPU dump\n");
+    if(cpu->reg_ptr != nullptr)
+        PRINT("  pointer  register: %lg [%p]\n", *cpu->reg_ptr, cpu->reg_ptr);
+    else
+        PRINT("  pointer  register: --||-- [%p]\n", cpu->reg_ptr);
 
-    PRINT("  pointer  register: %lg [%p]\n", *cpu->reg_ptr, cpu->reg_ptr);
     PRINT("  temp_8b  register: %hhu\n", cpu->reg_temp_8b);
     PRINT("  temp_64b register: %lg\n", cpu->reg_temp_64b);
 
@@ -51,6 +56,15 @@ void cpu_dump(CPU* cpu)
     }
     PRINT("\n  }\n");
 
+    PRINT("  {");
+    for(size_t iter = RAM_CAP; iter < MEM_CAP; iter++)
+    {
+        if(iter % 8 == 0)
+            PRINT("\n");
+        PRINT("    %4llu: %16llx ", (iter - RAM_CAP) * sizeof(val64_t), cpu->ram[iter]);
+    }
+    PRINT("\n  }\n");
+
     PRINT("  Registers\n");
     PRINT("  {");
     for(size_t iter = 0; iter < REGS_CAP; iter++)
@@ -59,7 +73,8 @@ void cpu_dump(CPU* cpu)
             PRINT("\n");
         PRINT("    %4llu: %10lg ", iter, cpu->regs[iter]);
     }
-    PRINT("\n  }\n\n");
+    PRINT("\n  }\n");
+    PRINT("----------------------------------------------------------------------------------------\n\n");
 
     fflush(stream);
 }

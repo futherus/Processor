@@ -37,8 +37,6 @@ enum reg_bin_code
 #undef DEF_REG
 /////////////////////////////////////////////
 
-const int REG_dax = 0x20;
-
 /// bin types
 typedef double        val64_t;
 typedef unsigned char val8_t;
@@ -67,9 +65,6 @@ const spec_t ARG_REGISTER    =  1;
 
 const spec_t MEM_NOT_RAM =  0;
 const spec_t MEM_RAM     =  1;
-
-/// Capacity of binary line buffer
-const size_t BIN_LINE_CAP = 0x200;
 
 enum Binary_err
 {

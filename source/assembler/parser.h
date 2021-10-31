@@ -2,13 +2,10 @@
 #define PARSER_H
 
 #include <stdint.h>
+#include "../processor_config.h"
 #include "../binary/Binary.h"
 #include "text/Text.h"
 #include "lexer.h"
-
-const size_t ARGS_CAP = 0x6;
-const size_t LEXS_CAP = 0x6;
-const size_t LBLS_CAP = 0x20;
 
 struct Command
 {
@@ -47,9 +44,6 @@ struct Labels_array
 
     size_t labels_sz = 0;
 };
-
-/// Capacity of text line buffer 
-const size_t TXT_CMD_CAP = 0x200;
 
 enum parser_err 
 {

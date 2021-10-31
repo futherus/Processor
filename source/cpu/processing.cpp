@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 #include "processing.h"
 #include "cpu_dump.h"
@@ -65,8 +66,11 @@ static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
         break;                                                  \
 
 #define dargs (cpu->regs + REG_dax)
-#define dtemp (cpu->regs + REGS_CAP - 4)
+#define dtemp (cpu->regs + REG_tax)
 #define wregs (cpu->regs)
+
+#define vram ((unsigned char*) (cpu->ram + RAM_CAP))
+
 
 cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
 {
@@ -89,7 +93,7 @@ cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
             }
         }
 
-        cpu_dump(cpu);
+        //cpu_dump(cpu, &bin->ip);
     }
         
     return CPU_NOERR;

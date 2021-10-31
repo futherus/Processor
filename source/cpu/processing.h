@@ -1,17 +1,15 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include "../processor_config.h"
 #include "../binary/Binary.h"
 #include "stack/include/Stack.h"
 
-const size_t REGS_CAP = 0x40; // dax number is 32! Be aware of SEGFAULT
-const size_t RAM_CAP  = 0x100;
-
 struct CPU 
 {
-    Stack stk = {};
+    val64_t ram[MEM_CAP] = {0};
 
-    val64_t ram[RAM_CAP] = {0};
+    Stack stk = {};
 
     val64_t regs[REGS_CAP]  = {0};
 
