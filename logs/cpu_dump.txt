@@ -1,0 +1,47 @@
+----------------------------------------------------------------------------------------------------
+Dumpsystem activated this stream (03:49:29 01.11.2021)
+
+stack_init_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_push_Stack [000000000064fb20] ok
+stack_pop_Stack [000000000064fb20] ok
+stack_dstr_Stack [000000000064fb20] ok
+
+End of log
+Dumpsystem disactivated this stream
+----------------------------------------------------------------------------------------------------

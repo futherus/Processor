@@ -1,0 +1,9 @@
+----------------------------------------------------------------------------------------------------
+Dumpsystem activated this stream (03:50:02 01.11.2021)
+
+LOG: "Execution time: 0.01562 s"
+at D:\Projects\Processor\source\assembler\asm.cpp:60:int main(int, char**)
+
+End of log
+Dumpsystem disactivated this stream
+----------------------------------------------------------------------------------------------------

@@ -11,29 +11,30 @@
 #include "cpu_dump.h"
 #include "stack/include/Stack.h"
 
-static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
+static processing_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 {
     cmd_t cmd = {};
     binary_swrite(&cmd, bin, sizeof(cmd_t));
 
     *dst_cmd = cmd;
     
-    return CPU_NOERR;
+    return PROCESSING_NOERR;
 }
 
+/////////////////////////////////////////////////////////////////////////
 // TODO: optimize to one switch
 #define get_arg()                                                       \
     {                                                                   \
         switch(cmd.bits.reg)                                            \
         {                                                               \
             case ARG_REGISTER:                                          \
-                binary_swrite(&cpu->reg_temp_8b, bin, sizeof(val8_t));  \
-                cpu->reg_ptr = &cpu->regs[cpu->reg_temp_8b];            \
+                binary_swrite(&cpu->reg_sys_8b, bin, sizeof(val8_t));   \
+                cpu->reg_ptr = &cpu->regs[cpu->reg_sys_8b];             \
                 break;                                                  \
                                                                         \
             case ARG_NOTREGISTER:                                       \
-                binary_swrite(&cpu->reg_temp_64b, bin, sizeof(val64_t));\
-                cpu->reg_ptr = &cpu->reg_temp_64b;                      \
+                binary_swrite(&cpu->reg_sys_64b, bin, sizeof(val64_t)); \
+                cpu->reg_ptr = &cpu->reg_sys_64b;                       \
                 break;                                                  \
                                                                         \
             default:                                                    \
@@ -53,26 +54,63 @@ static cpu_err get_cmd(cmd_t* dst_cmd, Binary* bin)
         }                                                               \
     }                                                                   \
 
-#define DEF_SYSCMD(TEXT, hash, W_ARG, CODE)                     \
-    case SYSCMD_##TEXT:                                         \
-        if(W_ARG)                                               \
-            get_arg();                                          \
-        CODE                                                    \
-        break;                                                  \
+/////////////////////////////////////////////////////////////////////////
+#ifdef CPU_DUMP
 
-#define DEF_CMD(TEXT, hash, N_ARGS, CODE)                       \
-    case CMD_##TEXT:                                            \
-        CODE                                                    \
-        break;                                                  \
+    #define DEF_SYSCMD(TEXT, hash, W_ARG, CODE)                     \
+        case SYSCMD_##TEXT:                                         \
+            if(W_ARG)                                               \
+                get_arg();                                          \
+            cpu_dump_cmd(#TEXT, cpu->reg_ptr, 1);                   \
+            CODE                                                    \
+            break;                                                  \
 
-#define dargs (cpu->regs + REG_dax)
-#define dtemp (cpu->regs + REG_tax)
-#define wregs (cpu->regs)
+    #define DEF_CMD(TEXT, hash, N_ARGS, CODE)                       \
+        case CMD_##TEXT:                                            \
+            cpu_dump_cmd(#TEXT, cpu->regs + REG_dax, N_ARGS);       \
+            CODE                                                    \
+            break;                                                  \
 
-#define vram ((unsigned char*) (cpu->ram + RAM_CAP))
+#else
 
+    #define DEF_SYSCMD(TEXT, hash, W_ARG, CODE)                     \
+        case SYSCMD_##TEXT:                                         \
+            if(W_ARG)                                               \
+                get_arg();                                          \
+            CODE                                                    \
+            break;                                                  \
 
-cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
+    #define DEF_CMD(TEXT, hash, N_ARGS, CODE)                       \
+        case CMD_##TEXT:                                            \
+            CODE                                                    \
+            break;                                                  \
+
+#endif // CPU_DUMP //////////////////////////////////////////////////////
+
+#define DARGS    (cpu->regs + REG_dax)
+#define DTMPS    (cpu->regs + REG_tax)
+#define REG_PTR  (cpu->reg_ptr)
+#define REG_SZ   (cpu->reg_sz)
+#define REG_INT  (cpu->reg_int)
+#define IP       (bin->ip)
+
+#define COPY(DST, SRC)     memcpy((DST), (SRC), sizeof(*(SRC)))
+#define PRINT(format, ...) fprintf(ostream, (format), ##__VA_ARGS__)
+#define SCAN(format, ...)  fscanf(istream,  (format), ##__VA_ARGS__)
+
+#ifdef CPU_VERBOSE
+    #define VERBOSE(format, ...) fprintf(ostream, (format), __VA_ARGS__)
+#else 
+    #define VERBOSE(format, ...) do{} while(0)
+#endif // CPU_VERBOSE
+
+#define RAM  (cpu->ram)
+#define VRAM ((unsigned char*) (cpu->ram + RAM_CAP))
+
+#define PUSH(ARG) stack_push(&cpu->stk, (ARG))
+#define POP(ARG)  stack_pop(&cpu->stk,  (ARG))
+
+processing_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
 {
     assert(cpu && bin);
 
@@ -89,14 +127,16 @@ cpu_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream)
             
             default:
             {
-                return CPU_UNKNWN_CMD;
+                return PROCESSING_UNKNWN_CMD;
             }
         }
 
-        //cpu_dump(cpu, &bin->ip);
+#ifdef CPU_DUMP
+        cpu_dump(cpu, &bin->ip);
+#endif
     }
         
-    return CPU_NOERR;
+    return PROCESSING_NOERR;
 }  
 
 #undef DEF_CMD

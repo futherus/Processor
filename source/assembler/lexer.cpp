@@ -26,7 +26,7 @@ static void wordlen_(char* ptr, int* n_read)
 
 #define DEF_REG(TXT, HASH)                    \
     case (HASH):                              \
-        CUR_LEXEM_.type      = LEX_REGISTER;  \
+        CUR_LEXEM_.type       = LEX_REGISTER; \
         CUR_LEXEM_.value.code = REG_##TXT;    \
         lexs->lexems_sz++;                    \
         pos += n_read;                        \
@@ -95,7 +95,7 @@ int lexer(Lexems_array* lexs, char* txt)
             wordlen_(txt + pos, &n_read);
 
             if(n_read == 0)
-                return 1;     // UNKNOWN SYMBOLS
+                return -1;     // UNKNOWN SYMBOLS
                 
             uint64_t hash = qhashfnv1_64(txt + pos, n_read);
 

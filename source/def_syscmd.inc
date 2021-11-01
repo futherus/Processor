@@ -1,10 +1,70 @@
 /* System commands of processor */
 
+/** Registers for arguments
+ *  NOT WRITABLE
+ */
+////DARGS 
+
+/** Temporary registers
+ *  Meant to be used during command execution
+ */
+////DTMPS
+
+/** Pointer to register with system argument
+ *  FOR SYSCMD ONLY
+ */
+////REG_PTR
+
+/** Register with relative stack size
+ *  NOT WRITABLE
+ */
+////REG_SZ   
+
+/** Register for integer calculation
+ *  Meant to be used during command execution
+ */
+////REG_INT  
+
+/** Instruction pointer of processor
+ *  FOR SYSCMD ONLY
+ *  Used for jumps and function calls
+ */
+////IP       
+
+/** \brief Copies src to dst
+ *  \param DST [out] Pointer to destination location
+ *  \param SRC [in]  Pointer to source location
+ */
+////COPY(DST, SRC)
+
+/// \brief Prints to output
+////PRINT(format, ...) 
+
+/// \brief Scans from input
+////SCAN(format, ...)  
+
+/// \brief Behaves like print, but only if #define'd CPU_VERBOSE
+////VERBOSE(format, ...)
+
+/// \brief Array of RAM, double
+////RAM  
+
+/// \brief Array of VRAM, unsigned char
+////VRAM
+
+/** \brief Pushes argument to stack
+ *  \param ARG [in]  Arg value
+ */
+////PUSH(ARG) 
+
+/** \brief Pops to argument from stack
+ *  \param ARG [out] Pointer to arg
+ */
+////POP(ARG) 
+
 DEF_SYSCMD(hal,  15619821718256421904ULL, 0,
 {
-    //fprintf(ostream, "HAL\n");
-
-    return CPU_NOERR;
+    return PROCESSING_NOERR;
 })
 
 /*  Can get only one-literal arg.
@@ -12,9 +72,7 @@ DEF_SYSCMD(hal,  15619821718256421904ULL, 0,
     Can be used for immensive reading from memory. */
 DEF_SYSCMD(push, 12441716782781469529ULL, 1, 
 {
-    //fprintf(ostream, "PUSH\n");
-    cpu->reg_sz++;
-    stack_push(&cpu->stk, *cpu->reg_ptr);
+    PUSH(*REG_PTR);
 })
 
 /*  Can get only one-literal arg.
@@ -22,110 +80,98 @@ DEF_SYSCMD(push, 12441716782781469529ULL, 1,
     The ONLY command able to write to memory. */
 DEF_SYSCMD(pop,  15612228490953510534ULL, 1,
 {
-    //fprintf(ostream, "POP\n");
-
-    stack_pop(&cpu->stk, cpu->reg_ptr);
+    POP(REG_PTR);
 })
 
 DEF_SYSCMD(add,  15626593610373248958ULL, 0,
 {
-    //fprintf(ostream, "ADD\n");
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
-
-    stack_push(&cpu->stk, dtemp[1] + dtemp[0]);
+    PUSH(DTMPS[1] + DTMPS[0]);
 })
 
 DEF_SYSCMD(sub,  15609385153883524641ULL, 0,
 {
-    //fprintf(ostream, "SUB\n");
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
-
-    stack_push(&cpu->stk, dtemp[1] - dtemp[0]);
+    PUSH(DTMPS[1] - DTMPS[0]);
 })
 
 DEF_SYSCMD(mul,  15615019051465342581ULL, 0,
 {
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_push(&cpu->stk, dtemp[1] * dtemp[0]);
-    
-    //fprintf(ostream, "MUL\n");
+    PUSH(DTMPS[1] * DTMPS[0]);    
 })
 DEF_SYSCMD(div,  15623727183559070478ULL, 0,
 {
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_push(&cpu->stk, dtemp[1] / dtemp[0]);
-
-    //fprintf(ostream, "DIV\n");
+    PUSH(DTMPS[1] / DTMPS[0]);
 })
 
 DEF_SYSCMD(jmp,  15618106480116791414ULL, 1,
 {
-    //fprintf(ostream, "JMP\n");
-
-    memcpy(&bin->ip, &cpu->reg_temp_64b, sizeof(size_t));
+    COPY(&IP, REG_PTR);
 })
 
 DEF_SYSCMD(ja,     590637888332048622ULL, 1,
 {
-    //fprintf(ostream, "JA\n");
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
-
-    if(dtemp[1] > dtemp[0])
-        memcpy(&bin->ip, &cpu->reg_temp_64b, sizeof(size_t));
+    if(DTMPS[1] > DTMPS[0])
+        COPY(&IP, REG_PTR);
 })
 
 DEF_SYSCMD(jae,   15618119674256329743ULL, 1,
 {
-    //fprintf(ostream, "JAE\n");
-    
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    if(dtemp[1] >= dtemp[0])
-        memcpy(&bin->ip, &cpu->reg_temp_64b, sizeof(size_t));
+    if(DTMPS[1] >= DTMPS[0])
+        COPY(&IP, REG_PTR);
 })
 
 DEF_SYSCMD(je,     590637888332048618ULL, 1,
 {
-    //fprintf(ostream, "JE\n");
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
 
-    stack_pop(&cpu->stk, &dtemp[0]);
-    stack_pop(&cpu->stk, &dtemp[1]);
+    if(DTMPS[1] == DTMPS[0])
+        COPY(&IP, REG_PTR);
+})
 
-    if(dtemp[1] == dtemp[0])
-        memcpy(&bin->ip, &cpu->reg_temp_64b, sizeof(size_t));
+DEF_SYSCMD(jne,  15618105380605163062ULL, 1,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+
+    if(DTMPS[1] != DTMPS[0])
+        COPY(&IP, REG_PTR);
 })
 
 DEF_SYSCMD(call,  2069086815125772341ULL, 1,
 {
-    //fprintf(ostream, "CALL\n");
-
-    memcpy(&dtemp[0], &cpu->reg_sz, sizeof(size_t));
-    memcpy(&dtemp[1], &bin->ip,    sizeof(size_t));
+    COPY(&DTMPS[0], &REG_SZ);
+    COPY(&DTMPS[1], &IP);
     
-    stack_push(&cpu->stk, dtemp[0]);    // push reg_sz
-    stack_push(&cpu->stk, dtemp[1]);    // push ip
 
-    memcpy(&bin->ip, &cpu->reg_temp_64b, sizeof(size_t)); // jump
+    PUSH(DTMPS[0]);  // push reg_sz
+    PUSH(DTMPS[1]);  // push ip
+
+    COPY(&IP, REG_PTR);
 })
 
 DEF_SYSCMD(ret,  15610251569046365794ULL, 0,
 {
-    //fprintf(ostream, "RET\n");
-        
-    stack_pop(&cpu->stk, &dtemp[0]);     // pop ip
-    stack_pop(&cpu->stk, &dtemp[1]);     // pop reg_sz
+    POP(&DTMPS[0]);  // pop ip
+    POP(&DTMPS[1]);  // pop reg_sz
 
-    memcpy(&cpu->reg_sz, &dtemp[1], sizeof(size_t));
-    memcpy(&bin->ip, &dtemp[0], sizeof(size_t));
+    COPY(&REG_SZ, &DTMPS[1]);
+    COPY(&IP,     &DTMPS[0]);
 })

@@ -15,7 +15,7 @@ static FILE* DUMP_STREAM = nullptr;
 static void (*PRINT_ELEM)(FILE*, const Elem_t*) = nullptr;
 
 //WARNING: not checked against overflow
-const size_t ERR_MSG_SZ = 8192;
+const size_t ERR_MSG_SZ = 4096;
 
 static void set_message_(char err_msg[], Stack_err err)
 {

@@ -12,6 +12,6 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line,
 
 void list_statement(Statement* stment, char* txt);
 
-void list_labels(Labels_array* lbl_arr);
+void list_labels(Label_array* lbl_arr);
 
 #endif // PARSER_LIST_H

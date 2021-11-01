@@ -38,7 +38,7 @@ struct Label
     uint64_t hash = 0;
 };
 
-struct Labels_array
+struct Label_array
 {
     Label  labels[LBLS_CAP] = {};
 
@@ -70,9 +70,9 @@ enum parser_err
 struct Parser_errstruct
 {
     size_t line = 0;
-    size_t pos = 0;
-    char txt[TXT_CMD_CAP] = "";
-    char infile[FILENAME_MAX];
+    size_t pos  = 0;
+    char txt[TXT_CMD_CAP]     = "";
+    char infile[FILENAME_MAX] = "";
 
     parser_err errnum = PARSER_NOERR;
 };

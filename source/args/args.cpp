@@ -50,7 +50,7 @@ args_msg process_args(int argc, char* argv[], char infile_name[], char outfile_n
         }
         else
         {
-            return ARGS_BAD_CMD; //BAD_CMD
+            return ARGS_BAD_CMD;
         }
     }
     

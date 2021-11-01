@@ -13,7 +13,7 @@
 
 static FILE* CPU_STREAM = nullptr;
 
-void cpu_dump_print_elem(FILE* ostream, const val64_t* elem)
+static void cpu_dump_print_elem(FILE* ostream, const val64_t* elem)
 {
     fprintf(ostream, "%lg", *elem);
 }
@@ -32,6 +32,7 @@ void cpu_dump(CPU* cpu, size_t* ip)
     FILE* stream = CPU_STREAM;
     if(!stream)
         return;
+        
     PRINT("\n----------------------------------------------------------------------------------------\n");
     PRINT("CPU dump\n");
     PRINT("INSTRUCTION POINTER: %llu\n", *ip);
@@ -39,10 +40,10 @@ void cpu_dump(CPU* cpu, size_t* ip)
     if(cpu->reg_ptr != nullptr)
         PRINT("  pointer  register: %lg [%p]\n", *cpu->reg_ptr, cpu->reg_ptr);
     else
-        PRINT("  pointer  register: --||-- [%p]\n", cpu->reg_ptr);
+        PRINT("  pointer  register: --//-- [%p]\n", cpu->reg_ptr);
 
-    PRINT("  temp_8b  register: %hhu\n", cpu->reg_temp_8b);
-    PRINT("  temp_64b register: %lg\n", cpu->reg_temp_64b);
+    PRINT("  sys_8b  register: %hhu\n", cpu->reg_sys_8b);
+    PRINT("  sys_64b register: %lg\n",  cpu->reg_sys_64b);
 
     stack_dump(&cpu->stk, "Stack\n");
 
@@ -56,12 +57,15 @@ void cpu_dump(CPU* cpu, size_t* ip)
     }
     PRINT("\n  }\n");
 
+    PRINT("  VRAM\n");
     PRINT("  {");
-    for(size_t iter = RAM_CAP; iter < MEM_CAP; iter++)
+    unsigned char* vram_ptr = (unsigned char*) (cpu->ram + RAM_CAP);
+
+    for(size_t iter = 0; iter < VRAM_CAP; iter += sizeof(uint64_t))
     {
-        if(iter % 8 == 0)
+        if(iter % (8 * sizeof(uint64_t)) == 0)
             PRINT("\n");
-        PRINT("    %4llu: %16llx ", (iter - RAM_CAP) * sizeof(val64_t), cpu->ram[iter]);
+        PRINT("    %4llu: %16llx ", iter, vram_ptr[iter]);
     }
     PRINT("\n  }\n");
 
@@ -75,6 +79,22 @@ void cpu_dump(CPU* cpu, size_t* ip)
     }
     PRINT("\n  }\n");
     PRINT("----------------------------------------------------------------------------------------\n\n");
+
+    fflush(stream);
+}
+
+void cpu_dump_cmd(const char* cmd_txt, val64_t* args, unsigned char args_sz)
+{
+    FILE* stream = CPU_STREAM;
+    if(!stream)
+        return;
+
+    PRINT("Command: %s (", cmd_txt);
+    for(unsigned char arg_iter = 0; arg_iter < args_sz; arg_iter++)
+    {
+        PRINT("%lg", args[arg_iter]);
+    }
+    PRINT(")\n");
 
     fflush(stream);
 }

@@ -8,6 +8,7 @@
 #include "parser_list.h"
 #include "../../debug_tools/debug_tools.h"
 
+/// Counter of parser passes. Valid values: 1, 2
 static int ITERATION = 0;
 
 Parser_errstruct* parser_errstruct()
@@ -54,9 +55,9 @@ Parser_errstruct* parser_errstruct()
 
 /////////////////////////////////////////////////////////////////////////////
 
-static Labels_array* labels_array()
+static Label_array* label_array()
 {
-    static Labels_array lbl_arr = {};
+    static Label_array lbl_arr = {};
 
     return &lbl_arr;
 }
@@ -82,9 +83,10 @@ static parser_err label(Lexems_array* lexs, Label* lbl, size_t ip)
 
 static parser_err get_label(Label* lbl)
 {
+    assert(lbl);
     assert(lbl->hash != 0);
 
-    Labels_array* lbl_arr = labels_array();
+    Label_array* lbl_arr = label_array();
 
     for(size_t iter = 0; iter < lbl_arr->labels_sz; iter++)
     {
@@ -100,7 +102,7 @@ static parser_err get_label(Label* lbl)
 
 static parser_err add_label(Label* lbl)
 {
-    Labels_array* lbl_arr = labels_array();
+    Label_array* lbl_arr = label_array();
 
     if(get_label(lbl) == PARSER_LABEL_NODECL)
     {
@@ -176,7 +178,7 @@ static parser_err primary(Lexems_array* lexs, Argument* arg)
             PARSER_ASSERT_SETPOS(!err && lex.type == LEX_RRPAR, PARSER_MISSING_PARENTHESES, lex.pos);
             
             break;
-        case LEX_IMMCONST: case LEX_REGISTER :
+        case LEX_IMMCONST : case LEX_REGISTER :
             arg->lexs[arg->lexs_sz++] = lex;
 
             break;
@@ -446,7 +448,7 @@ static parser_err statement(Lexems_array* lexs, Statement* stment)
             assert(0);                                                      \
     } while(0)                                                              \
 
-static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg, size_t* arg_iter)
+static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg, unsigned char* arg_iter)
 {
     for(size_t lex_iter = 0; lex_iter < arg->lexs_sz; lex_iter++)
     {
@@ -464,12 +466,11 @@ static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg, size_
             case LEX_MUL:
                 PUT_CMD(SYSCMD_mul);
                 break;
-            
         }
     }
 
     Lexem d$x_lex = {};
-    d$x_lex.type  = LEX_REGISTER;
+    d$x_lex.type       = LEX_REGISTER;
     d$x_lex.value.code = REG_dax + *arg_iter;
 
     PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lex); // pop argument to d$x (dark register)
@@ -497,7 +498,7 @@ static parser_err put_statement(bin_t* dst_line, size_t* pos, Statement* stment)
     }
     else
     {
-        for(size_t arg_iter = 0; arg_iter < stment->args_sz; arg_iter++)
+        for(unsigned char arg_iter = 0; arg_iter < stment->args_sz; arg_iter++)
         {
             put_evaluated_arg(dst_line, pos, &stment->args[arg_iter], &arg_iter); // evaluates argument, pushes it to dax...dzx
         }
@@ -522,7 +523,7 @@ static parser_err parse_line(bin_t* bin_line, size_t* bin_line_sz, size_t* ip, c
 
     lexer(&lexs, txt);
 
-    if((err = label(&lexs, &lbl, *ip)) == 0) //if line is label
+    if((err = label(&lexs, &lbl, *ip)) == 0)        //if line is label
     {
         if(ITERATION == 1)
             return add_label(&lbl);
@@ -552,7 +553,6 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
 {
     parser_dump_init();
     parser_err err = PARSER_NOERR;
-    parser_err save_err = PARSER_NOERR;
 
     size_t ip = 0;
     size_t n_line = txt->index_arr_size;
@@ -571,7 +571,6 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
             err = parse_line(bin_line, &bin_line_sz, &ip, txt_line);
             if(err && ITERATION == 2)
             {
-                save_err = err;
                 PARSER_LOG_ERR(err, line, txt_line, infilename);
             }
 
@@ -584,8 +583,8 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
         }
 
         if(ITERATION == 1)
-            list_labels(labels_array());
+            list_labels(label_array());
     }
     
-    return save_err;
+    return PARSER_NOERR;
 }

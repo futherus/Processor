@@ -1,0 +1,1743 @@
+----------------------------------------------------------------------------------------------------
+Dumpsystem activated this stream (03:49:58 01.11.2021)
+
+Labels:
+{
+  Label:
+    ip:   88
+    hash: 2231712441984448230
+  Label:
+    ip:   107
+    hash: 1058854425313605113
+  Label:
+    ip:   136
+    hash: 17473923032600380576
+  Label:
+    ip:   218
+    hash: 3935998334206003332
+  Label:
+    ip:   257
+    hash: 10177813604372134439
+  Label:
+    ip:   339
+    hash: 15622888256186934852
+  Label:
+    ip:   340
+    hash: 7921441881889061542
+}
+Statement
+  Txt code: `in`
+  Command:
+    value:  17
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `in`
+  Command:
+    value:  17
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `in`
+  Command:
+    value:  17
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rcx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 9.88131e-324
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `pop rbx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `pop rax`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rax`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `jne A_not0`
+  Command:
+    value:  11
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `jne B_not0`
+  Command:
+    value:  11
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rcx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 9.88131e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `jne C_not0`
+  Command:
+    value:  11
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push -777`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): -777
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push -666`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): -666
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `pop  rfx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.47033e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rcx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 9.88131e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `pop  rgx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.96439e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `call linear`
+  Command:
+    value:  12
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rhx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 3.45846e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `push -4`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): -4
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rax`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rcx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 9.88131e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `add`
+  Command:
+    value:  3
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rdx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push rdx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `ja D_abt0`
+  Command:
+    value:  8
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rdx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `je D_eq0`
+  Command:
+    value:  10
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push -666`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): -666
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push 2`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 2
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rax`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rfx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.47033e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `pop rgx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.96439e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `call linear`
+  Command:
+    value:  12
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rhx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 3.45846e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `sqrt rdx`
+  Command:
+    value:  16
+    is_sys  0
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `pop rdx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push 2`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 2
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rax`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rfx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.47033e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rdx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `add`
+  Command:
+    value:  3
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rgx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.96439e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `call linear`
+  Command:
+    value:  12
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rhx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 3.45846e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `push 2`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 2
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rax`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `mul`
+  Command:
+    value:  5
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rfx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.47033e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `push rbx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 4.94066e-324
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rdx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 1.4822e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `sub`
+  Command:
+    value:  4
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rgx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.96439e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `call linear`
+  Command:
+    value:  12
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `push rhx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 3.45846e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `out`
+  Command:
+    value:  18
+    is_sys  0
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `jmp end`
+  Command:
+    value:  7
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 0
+      Lexems:
+      {
+      }
+  }
+
+Statement
+  Txt code: `hal`
+  Command:
+    value:  0
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `push 0`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           3
+          value (double): 0
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rgx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.96439e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `push rfx`
+  Command:
+    value:  1
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 2.47033e-323
+          pos:            5
+      }
+  }
+
+Statement
+  Txt code: `div`
+  Command:
+    value:  6
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `sub`
+  Command:
+    value:  4
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+Statement
+  Txt code: `pop rhx`
+  Command:
+    value:  2
+    is_sys  1
+    hash:   0
+    n_args: 1
+  args_sz: 1
+  Arguments:
+  {
+    Argument #0
+      isRAM:  0
+      lit_sz: 1
+      Lexems:
+      {
+        Lexem #0
+          type:           2
+          value (double): 3.45846e-323
+          pos:            4
+      }
+  }
+
+Statement
+  Txt code: `ret`
+  Command:
+    value:  13
+    is_sys  1
+    hash:   0
+    n_args: 0
+  args_sz: 0
+  Arguments:
+  {
+  }
+
+
+End of log
+Dumpsystem disactivated this stream
+----------------------------------------------------------------------------------------------------

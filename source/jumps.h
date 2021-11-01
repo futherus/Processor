@@ -8,6 +8,7 @@
 #define   RETRY__               goto try__;
 #define   FINALLY__             finally__:
 #define   RETURN__              goto finally__;
+#define   FAIL__                goto catch__;
 #define   ENDTRY__              }
 
 #endif // JUMPS_H

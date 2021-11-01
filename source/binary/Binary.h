@@ -42,7 +42,7 @@ typedef double        val64_t;
 typedef unsigned char val8_t;
 
 /// specifier type
-typedef int           spec_t;
+typedef bool          spec_t;
 
 /// Binary type
 typedef unsigned char bin_t;
@@ -63,8 +63,8 @@ union cmd_t
 const spec_t ARG_NOTREGISTER =  0;
 const spec_t ARG_REGISTER    =  1;
 
-const spec_t MEM_NOT_RAM =  0;
-const spec_t MEM_RAM     =  1;
+const spec_t MEM_NOT_RAM     =  0;
+const spec_t MEM_RAM         =  1;
 
 enum Binary_err
 {
@@ -80,8 +80,8 @@ struct Binary
 {
     bin_t* buffer = nullptr;   ///< Pointer to beginning of allocated memory
     size_t ip     = 0;         ///< Instruction pointer      (position of unread element in buffer)
-    size_t sz     = 0;         ///< Size of used memory      (in sizeof(bin_t*))
-    size_t cap    = 0;         ///< Size of allocated memory (in sizeof(bin_t*))
+    size_t sz     = 0;         ///< Size of used memory      (in sizeof(bin_t))
+    size_t cap    = 0;         ///< Size of allocated memory (in sizeof(bin_t))
 };
 
 Binary_err binary_init(Binary* bin, ssize_t cap);

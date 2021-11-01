@@ -29,7 +29,7 @@ const static char LABEL_NODECL[]        = "no label declaration";
 void parser_dump_init()
 {
     BINLINE_STREAM = dumpsystem_get_stream(binline_list);
-    PARSER_STREAM  = dumpsystem_get_stream(expression_list);
+    PARSER_STREAM  = dumpsystem_get_stream(statement_list);
 }
 
 #define PRINT(format, ...) fprintf(stream, format, ##__VA_ARGS__)
@@ -102,7 +102,7 @@ void log_err()
 ////////////////////////    Line listing    ////////////////////////
 void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line, size_t next_ip)
 {
-    static int first_call = 1;
+    static bool first_call = 1;
     FILE* stream = BINLINE_STREAM;
     if(!stream)
         return;
@@ -112,7 +112,7 @@ void list_line(bin_t* bin_line, size_t bin_line_sz, char* txt_line, size_t line,
     if(first_call)
     {
         PRINT("|Line||Command----------------||-IP-|");
-        for(int addr = 0; addr < 50; addr++)
+        for(int addr = 0; addr < 64; addr++)
         {
             if(addr % 8 == 0)
                 PRINT("|");
@@ -163,11 +163,11 @@ static void list_arg(Argument* arg, FILE* stream)
     PRINT("      isRAM:  %d\n",   arg->memory);
     PRINT("      lit_sz: %llu\n", arg->lexs_sz);
 
-    PRINT("      Literals:\n");
+    PRINT("      Lexems:\n");
     PRINT("      {\n");
     for(size_t lit_iter = 0; lit_iter < arg->lexs_sz; lit_iter++)
     {
-        PRINT("        Literal #%llu\n", lit_iter);
+        PRINT("        Lexem #%llu\n", lit_iter);
         list_lex(&arg->lexs[lit_iter], stream);
     }
     PRINT("      }\n");
@@ -200,7 +200,7 @@ void list_statement(Statement* stment, char* txt)
 }
 
 ////////////////////////  Labels listing  ////////////////////////
-void list_labels(Labels_array* lbl_arr)
+void list_labels(Label_array* lbl_arr)
 {
     FILE* stream = PARSER_STREAM;
     if(!stream)

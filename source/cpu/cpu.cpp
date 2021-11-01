@@ -11,13 +11,8 @@
 #include "../args/args.h"
 #include "cpu_dump.h"
 #include "../cpu_time.h"
-
-#define A$(condition, err)                      \
-    if(!(condition))                            \
-    {                                           \
-        fprintf(stderr, "Error: %s", #err);     \
-        return (err);                           \
-    }                                           \
+#include "../dumpsystem/dumpsystem.h"
+#include "../jumps.h"
 
 static int file_sz(const char filename[], ssize_t* sz)
 {
@@ -30,6 +25,15 @@ static int file_sz(const char filename[], ssize_t* sz)
     return 0;
 }
 
+enum cpu_error
+{
+    CPU_NOERR          = 0,
+    CPU_ARGS_ERR       = 1,
+    CPU_PROCESSING_ERR = 2,
+    CPU_SYS_FAIL       = 3,
+    CPU_READ_FAIL      = 4,
+    CPU_STACK_FAIL     = 5,
+};
 int main(int argc, char* argv[])
 {
     char binfile_name[FILENAME_MAX] = "";
@@ -38,41 +42,53 @@ int main(int argc, char* argv[])
     if(msg)
     {
         response_args(msg);
-        return msg;
+        return CPU_ARGS_ERR;
     }
 
     cpu_dump_init();
-    
-    ssize_t binfile_sz = 0;
-    A$(file_sz(binfile_name, &binfile_sz) == 0, CPU_READ_FAIL);
-
-    FILE* binstream = fopen(binfile_name, "rb");
-    A$(binstream, CPU_READ_FAIL);
-
-    CPU cpu = {};
-    stack_init(&cpu.stk, 0);
 
     Binary bin = {};
+    ssize_t binfile_sz = 0;
 
-    A$(binary_init(&bin, binfile_sz) == 0, CPU_BIN_FAIL);
+    CPU cpu = {};
 
-    A$(binary_fread(&bin, binstream, binfile_sz) == 0, CPU_READ_FAIL);
+    FILE* binstream = nullptr;
+    FILE* istream   = stdin;
+    FILE* ostream   = stdout;
+    
+    double start_time  = 0;
+    double finish_time = 0;
 
-    A$(fclose(binstream) == 0, CPU_READ_FAIL);
+TRY__
+    CHECK$(file_sz(binfile_name, &binfile_sz), CPU_READ_FAIL, FAIL__)
 
-    FILE* istream = stdin;
-    FILE* ostream = stdout;
+    binstream = fopen(binfile_name, "rb");
+    CHECK$(binstream == nullptr,         CPU_READ_FAIL,  FAIL__)
 
-    double begin_time = get_cpu_time();
+    CHECK$(stack_init(&cpu.stk, 0),      CPU_STACK_FAIL, FAIL__)
 
-    A$(processing(&bin, &cpu, istream, ostream) == 0, CPU_PROCESSING_FAIL);
+    PASS$(binary_init(&bin, binfile_sz),                 FAIL__)
 
-    double end_time = get_cpu_time();
+    PASS$(binary_fread(&bin, binstream, binfile_sz),     FAIL__)
 
-    fprintf(stderr, "Execution time: %lg s", end_time - begin_time);
+    CHECK$(fclose(binstream),            CPU_READ_FAIL,  FAIL__)
 
+    start_time = get_cpu_time();
+
+    CHECK$(processing(&bin, &cpu, istream, ostream), CPU_PROCESSING_ERR, FAIL__)
+
+    finish_time = get_cpu_time();
+
+    LOG$("Execution time: %.4lg s", finish_time - start_time)
+
+CATCH__
+    ERROR__ = CPU_SYS_FAIL;
+
+FINALLY__
     stack_dstr(&cpu.stk);
-    A$(binary_dstr(&bin) == 0, CPU_BIN_FAIL);
+    binary_dstr(&bin);
 
-    return 0;
+    return ERROR__;
+
+ENDTRY__
 }

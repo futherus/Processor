@@ -4,20 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../dumpsystem/dumpsystem.h"
 #include "text/Text.h"
 #include "../args/args.h"
 #include "parser.h"
 #include "../binary/Binary.h"
 #include "../jumps.h"
+#include "../cpu_time.h"
 
-enum asm_err
+enum asm_error
 {
-    ASM_NOERR      = 0,
-    ASM_ARGS_FAIL  = 1,
-    ASM_READ_FAIL  = 2,
-    ASM_PARSE_FAIL = 3,
-    ASM_WRITE_FAIL = 4,
-    ASM_BIN_FAIL   = 5,
+    ASM_NOERR       = 0,
+    ASM_ARGS_ERR    = 1,
+    ASM_SYNTAX_ERR  = 2,
+    ASM_SYS_FAIL    = 3,
+    ASM_READ_FAIL   = 4,
+    ASM_WRITE_FAIL  = 5,
 };
 
 int main(int argc, char* argv[])
@@ -29,32 +32,42 @@ int main(int argc, char* argv[])
     if(msg)
     {
         response_args(msg);
-        return ASM_ARGS_FAIL;
+        return ASM_ARGS_ERR;
     }
 
     Text txt = {};
     Binary bin = {};
     FILE* ostream = nullptr;
 
+    double start_time  = 0;
+    double finish_time = 0;
+
 TRY__    
-    CHECK__(text_create(&txt, infile_name), ASM_READ_FAIL);
+    CHECK$(text_create(&txt, infile_name), ASM_SYS_FAIL, FAIL__)
 
-    //text_clean(txt, ';'); // function cleans all after delimiter
+    PASS$(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size), FAIL__)
 
-    CHECK__(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size), ASM_BIN_FAIL);
+    start_time = get_cpu_time();
 
-    parser(&bin, &txt, infile_name);
-    CHECK__(parser_errstruct()->errnum, ASM_PARSE_FAIL);
+    if(parser(&bin, &txt, infile_name))
+    {
+        ERROR__ = ASM_SYNTAX_ERR;
+        RETURN__;
+    }
+
+    finish_time = get_cpu_time();
+
+    LOG$("Execution time: %.4lg s", finish_time - start_time);
 
     ostream = fopen(outfile_name, "wb");
-    CHECK__(ostream == nullptr, ASM_WRITE_FAIL);
+    CHECK$(ostream == nullptr, ASM_SYS_FAIL, FAIL__)
     
-    CHECK__(binary_fwrite(ostream, &bin, bin.sz), ASM_WRITE_FAIL);
+    PASS$(binary_fwrite(ostream, &bin, bin.sz), FAIL__)
 
 CATCH__
-    printf("Error in asm.cpp");
+    ERROR__ = ASM_SYS_FAIL;
+
 FINALLY__
-    printf("No error in asm.cpp");
     fclose(ostream);
     text_destroy(&txt);
     binary_dstr(&bin);

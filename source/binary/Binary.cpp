@@ -3,18 +3,17 @@
 #include <stdlib.h>
 
 #include "Binary.h"
-
-#define ASSERT(condition, err)  assert((condition))
+#include "../dumpsystem/dumpsystem.h"
 
 Binary_err binary_init(Binary* bin, ssize_t cap)
 {
-    ASSERT(bin, BIN_NULLPTR);
+    CHECK$(!bin,         BIN_NULLPTR,   return BIN_NULLPTR;   )
     
-    ASSERT(cap > 0, BIN_SIZE_ERR);
+    CHECK$(cap <= 0,     BIN_SIZE_ERR,  return BIN_SIZE_ERR;  )
 
     bin->buffer = (bin_t*) calloc(cap, sizeof(bin_t));
 
-    ASSERT(bin->buffer, BIN_BAD_ALLOC);
+    CHECK$(!bin->buffer, BIN_BAD_ALLOC, return BIN_BAD_ALLOC; )
 
     bin->ip  = 0;
     bin->sz  = 0;
@@ -25,9 +24,9 @@ Binary_err binary_init(Binary* bin, ssize_t cap)
 
 Binary_err binary_sread(Binary* bin, void* src, size_t count)
 {
-    ASSERT(bin && src, BIN_NULLPTR);
-    ASSERT(bin->buffer, BIN_NULL_BUF);
-    ASSERT(bin->sz + count <= bin->cap, BIN_SIZE_ERR);
+    CHECK$(!(bin && src),              BIN_NULLPTR,  return BIN_NULLPTR;  )
+    CHECK$(!bin->buffer,               BIN_NULL_BUF, return BIN_NULL_BUF; )
+    CHECK$(bin->sz + count > bin->cap, BIN_SIZE_ERR, return BIN_SIZE_ERR; )
     
     memcpy(&bin->buffer[bin->sz], src, count * sizeof(bin_t));
 
@@ -38,14 +37,14 @@ Binary_err binary_sread(Binary* bin, void* src, size_t count)
 
 Binary_err binary_fread(Binary* bin, FILE* istream, size_t count)
 {
-    ASSERT(bin && istream, BIN_NULLPTR);
-    ASSERT(bin->buffer, BIN_NULL_BUF);
-    ASSERT(bin->sz + count <= bin->cap, BIN_SIZE_ERR);
+    CHECK$(!(bin && istream),          BIN_NULLPTR,    return BIN_NULLPTR;  )
+    CHECK$(!bin->buffer,               BIN_NULL_BUF,   return BIN_NULL_BUF; )
+    CHECK$(bin->sz + count > bin->cap, BIN_SIZE_ERR,   return BIN_SIZE_ERR; )
 
     size_t n_read = fread(bin->buffer, sizeof(bin_t), count, istream);
 
     if(n_read != count)
-        ASSERT(!ferror(istream), BIN_STREAM_FAIL); 
+        CHECK$(!ferror(istream),        BIN_STREAM_FAIL, return BIN_STREAM_FAIL;)
 
     bin->sz += count;
 
@@ -54,9 +53,9 @@ Binary_err binary_fread(Binary* bin, FILE* istream, size_t count)
 
 Binary_err binary_swrite(void* dst, Binary* bin, size_t count)
 {
-    ASSERT(dst && bin, BIN_NULLPTR);
-    ASSERT(bin->buffer, BIN_NULL_BUF);
-    ASSERT(count <= bin->sz - bin->ip, BIN_SIZE_ERR);
+    CHECK$(!(dst && bin),             BIN_NULLPTR,  return BIN_NULLPTR;  )
+    CHECK$(!bin->buffer,              BIN_NULL_BUF, return BIN_NULL_BUF; )
+    CHECK$(count > bin->sz - bin->ip, BIN_SIZE_ERR, return BIN_SIZE_ERR; )
         
     memcpy(dst, &(bin->buffer[bin->ip]), count * sizeof(bin_t));
 
@@ -67,12 +66,12 @@ Binary_err binary_swrite(void* dst, Binary* bin, size_t count)
 
 Binary_err binary_fwrite(FILE* ostream, Binary* bin, size_t count)
 {
-    ASSERT(ostream && bin, BIN_NULLPTR);
-    ASSERT(bin->buffer, BIN_NULL_BUF);
-    ASSERT(count <= bin->sz - bin->ip, BIN_SIZE_ERR);
+    CHECK$(!(ostream && bin),         BIN_NULLPTR,     return BIN_NULLPTR;  )
+    CHECK$(!bin->buffer,              BIN_NULL_BUF,    return BIN_NULL_BUF; )
+    CHECK$(count > bin->sz - bin->ip, BIN_SIZE_ERR,    return BIN_SIZE_ERR; )
 
     size_t n_written = fwrite(&bin->buffer[bin->ip], sizeof(bin_t), count, ostream);
-    ASSERT(n_written == count, BIN_STREAM_FAIL);
+    CHECK$(n_written != count,        BIN_STREAM_FAIL, return BIN_STREAM_FAIL; )
 
     bin->ip += count;
 
@@ -81,8 +80,7 @@ Binary_err binary_fwrite(FILE* ostream, Binary* bin, size_t count)
 
 Binary_err binary_dstr(Binary* bin)
 {
-    if(!bin)
-        return BIN_NULLPTR;
+    CHECK$(!bin, BIN_NULLPTR, return BIN_NULLPTR; )
         
     free(bin->buffer);
 
