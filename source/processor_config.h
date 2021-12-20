@@ -34,13 +34,15 @@ const unsigned char REG_tax = USRREGS_CAP + ARGREGS_CAP;
 const unsigned char REGS_CAP = USRREGS_CAP + ARGREGS_CAP + TEMPREGS_CAP;
 
 /// Capacity of RAM
-const size_t RAM_CAP  = 0x100;
+const size_t RAM_CAP = 0x4000;
 
 /// Capacity of VRAM
-const long RESOL_X  = 128;
+const long RESOL_X  = 144;
 const long RESOL_Y  = 72;
 const size_t VRAM_CAP = RESOL_X * RESOL_Y;
 
 const size_t MEM_CAP  = RAM_CAP + VRAM_CAP / sizeof(size_t);
+
+const double EPSILON = 1e-50;
 
 #endif // PROCESSOR_CONFIG_H

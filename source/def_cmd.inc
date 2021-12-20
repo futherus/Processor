@@ -62,6 +62,86 @@
  */
 ////POP(ARG) 
 
+DEF_CMD(eq,    590643385890189695ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[0], DTMPS[1]) == 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(neq, 15614157034349014371ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[0], DTMPS[1]) != 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(gr,    590641186866933210ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], DTMPS[0]) > 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(le,    590635689308792140ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], DTMPS[0]) < 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(leq, 15616140553325928533ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], DTMPS[0]) <= 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(geq, 15620925627930956582ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], DTMPS[0]) >= 0)
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(and,  15626582615256966840ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], 0) && CMP(DTMPS[0], 0))
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
+DEF_CMD(or,     590632390773907554ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+    if(CMP(DTMPS[1], 0) || CMP(DTMPS[0], 0))
+        PUSH(1);
+    else
+        PUSH(0);
+})
+
 DEF_CMD(sin,  15609380755837011737ULL, 1,
 {
     DTMPS[0] = sin(DARGS[0]);
@@ -136,4 +216,48 @@ DEF_CMD(dspl,  1521302425519142494ULL, 0,
         PRINT("-");
 
     PRINT("\n");
+})
+
+DEF_CMD(show, 10597054029992354278ULL, 2,
+{
+    PRINT("\n");
+
+    if(DARGS[1] + DARGS[0] > RAM_CAP)
+        return PROCESSING_RAM_OVERFLOW;
+    
+    long resol = (long) sqrt(DARGS[1]);
+    PRINT("Resolution: %ld\n", resol);
+    for(long iter = 0; iter < resol; iter++)
+        PRINT("--");
+
+    for(long iter_y = 0; iter_y < resol; iter_y++)
+    {
+        PRINT("\n");
+        for(long iter_x = 0; iter_x < resol; iter_x++)
+        {
+            if(CMP(RAM[(long) DARGS[0] + iter_y * resol + iter_x], 0) == 0)
+                PRINT("  ");
+            else
+                PRINT("$$");
+        }
+    }
+    PRINT("\n");
+
+    for(long iter = 0; iter < resol; iter++)
+        PRINT("--");
+
+    PRINT("\n");
+})
+
+DEF_CMD(int, 15618947606512183472ULL, 1,
+{
+    PUSH(lround(DARGS[0]));
+})
+
+DEF_CMD(pow, 15612228490953510529ULL, 0,
+{
+    POP(&DTMPS[0]);
+    POP(&DTMPS[1]);
+
+    PUSH(pow(DTMPS[1], DTMPS[0]));
 })

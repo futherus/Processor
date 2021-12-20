@@ -11,6 +11,16 @@
 #include "cpu_dump.h"
 #include "stack/include/Stack.h"
 
+static int CMP(double var1, double var2)
+{
+    if(var1 - var2 > EPSILON)
+        return 1;
+    else if(var1 - var2 < -EPSILON)
+        return -1;
+    else
+        return 0;
+}
+
 static processing_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 {
     cmd_t cmd = {};
@@ -101,7 +111,7 @@ static processing_err get_cmd(cmd_t* dst_cmd, Binary* bin)
 #ifdef CPU_VERBOSE
     #define VERBOSE(format, ...) fprintf(ostream, (format), __VA_ARGS__)
 #else 
-    #define VERBOSE(format, ...) do{} while(0)
+    #define VERBOSE(format, ...) {void(0);}
 #endif // CPU_VERBOSE
 
 #define RAM  (cpu->ram)

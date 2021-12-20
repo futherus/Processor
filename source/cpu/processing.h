@@ -7,7 +7,7 @@
 
 struct CPU 
 {
-    val64_t ram[MEM_CAP] = {0};
+    val64_t* ram = {0};
 
     Stack stk = {};
 
@@ -25,12 +25,13 @@ struct CPU
 enum processing_err
 {
     PROCESSING_NOERR = 0,
-    PROCESSING_READ_FAIL,
-    PROCESSING_BIN_FAIL,
-    PROCESSING_UNKNWN_CMD,
-    PROCESSING_READCMD_FAIL,
-    PROCESSING_READARG_FAIL,
-    PROCESSING_PROCESSING_FAIL,
+    PROCESSING_READ_FAIL = 1,
+    PROCESSING_BIN_FAIL = 2,
+    PROCESSING_UNKNWN_CMD = 3,
+    PROCESSING_READCMD_FAIL = 4,
+    PROCESSING_READARG_FAIL = 5,
+    PROCESSING_PROCESSING_FAIL = 6,
+    PROCESSING_RAM_OVERFLOW = 7,
 };
 
 processing_err processing(Binary* bin, CPU* cpu, FILE* istream, FILE* ostream);

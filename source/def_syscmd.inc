@@ -62,7 +62,7 @@
  */
 ////POP(ARG) 
 
-DEF_SYSCMD(hal,  15619821718256421904ULL, 0,
+DEF_SYSCMD(hlt,  15619827215814562959ULL, 0,
 {
     return PROCESSING_NOERR;
 })
@@ -124,7 +124,7 @@ DEF_SYSCMD(ja,     590637888332048622ULL, 1,
     POP(&DTMPS[0]);
     POP(&DTMPS[1]);
 
-    if(DTMPS[1] > DTMPS[0])
+    if(CMP(DTMPS[1], DTMPS[0]) > 0)
         COPY(&IP, REG_PTR);
 })
 
@@ -133,7 +133,7 @@ DEF_SYSCMD(jae,   15618119674256329743ULL, 1,
     POP(&DTMPS[0]);
     POP(&DTMPS[1]);
 
-    if(DTMPS[1] >= DTMPS[0])
+    if(CMP(DTMPS[1], DTMPS[0]) >= 0)
         COPY(&IP, REG_PTR);
 })
 
@@ -142,7 +142,7 @@ DEF_SYSCMD(je,     590637888332048618ULL, 1,
     POP(&DTMPS[0]);
     POP(&DTMPS[1]);
 
-    if(DTMPS[1] == DTMPS[0])
+    if(CMP(DTMPS[1], DTMPS[0]) == 0)
         COPY(&IP, REG_PTR);
 })
 
@@ -151,7 +151,7 @@ DEF_SYSCMD(jne,  15618105380605163062ULL, 1,
     POP(&DTMPS[0]);
     POP(&DTMPS[1]);
 
-    if(DTMPS[1] != DTMPS[0])
+    if(CMP(DTMPS[1], DTMPS[0]) != 0)
         COPY(&IP, REG_PTR);
 })
 

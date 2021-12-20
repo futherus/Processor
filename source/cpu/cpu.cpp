@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <assert.h>
 
 #include "processing.h"
 #include "stack/include/Stack.h"
@@ -14,8 +15,21 @@
 #include "../dumpsystem/dumpsystem.h"
 #include "../jumps.h"
 
+enum cpu_error
+{
+    CPU_NOERR          = 0,
+    CPU_ARGS_ERR       = 1,
+    CPU_PROCESSING_ERR = 2,
+    CPU_SYS_FAIL       = 3,
+    CPU_READ_FAIL      = 4,
+    CPU_STACK_FAIL     = 5,
+    CPU_BAD_ALLOC      = 6,
+};
+
 static int file_sz(const char filename[], ssize_t* sz)
 {
+    assert(filename && sz);
+
     struct stat buff = {};
     if(stat(filename, &buff) == -1)
         return -1;
@@ -25,15 +39,16 @@ static int file_sz(const char filename[], ssize_t* sz)
     return 0;
 }
 
-enum cpu_error
+static cpu_error cpu_init(CPU* cpu)
 {
-    CPU_NOERR          = 0,
-    CPU_ARGS_ERR       = 1,
-    CPU_PROCESSING_ERR = 2,
-    CPU_SYS_FAIL       = 3,
-    CPU_READ_FAIL      = 4,
-    CPU_STACK_FAIL     = 5,
-};
+    assert(cpu);
+
+    cpu->ram = (val64_t*) calloc(MEM_CAP, sizeof(val64_t));
+    CHECK$(!cpu->ram, CPU_BAD_ALLOC, return CPU_BAD_ALLOC; )
+
+    return CPU_NOERR;
+}
+
 int main(int argc, char* argv[])
 {
     char binfile_name[FILENAME_MAX] = "";
@@ -72,6 +87,8 @@ TRY__
     PASS$(binary_fread(&bin, binstream, binfile_sz),     FAIL__)
 
     CHECK$(fclose(binstream),            CPU_READ_FAIL,  FAIL__)
+
+    CHECK$(cpu_init(&cpu),               CPU_BAD_ALLOC,  FAIL__)
 
     start_time = get_cpu_time();
 

@@ -448,7 +448,7 @@ static parser_err statement(Lexems_array* lexs, Statement* stment)
             assert(0);                                                      \
     } while(0)                                                              \
 
-static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg, unsigned char* arg_iter)
+static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg)
 {
     for(size_t lex_iter = 0; lex_iter < arg->lexs_sz; lex_iter++)
     {
@@ -468,19 +468,6 @@ static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg, unsig
                 break;
         }
     }
-
-    Lexem d$x_lex = {};
-    d$x_lex.type       = LEX_REGISTER;
-    d$x_lex.value.code = REG_dax + *arg_iter;
-
-    PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lex); // pop argument to d$x (dark register)
-
-    if(arg->memory == MEM_RAM)  //if access to RAM
-    {
-        PUT_CMD_WA(SYSCMD_push, MEM_RAM, d$x_lex); // push RAM[d$x]
-
-        PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lex); // pop to d$x
-    }
 }
 
 static parser_err put_statement(bin_t* dst_line, size_t* pos, Statement* stment)
@@ -491,7 +478,33 @@ static parser_err put_statement(bin_t* dst_line, size_t* pos, Statement* stment)
     {
         PUT_CMD(stment->cmd.code);
     }
+    else if(stment->cmd.code == SYSCMD_push && stment->args[0].lexs_sz > 0)
+    {
+        put_evaluated_arg(dst_line, pos, &stment->args[0]);
 
+        if(stment->args[0].memory == MEM_RAM)
+        {
+            Lexem dax_lex = {};
+            dax_lex.type = LEX_REGISTER;
+            dax_lex.value.code = REG_dax;
+
+            PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, dax_lex);
+            PUT_CMD_WA(SYSCMD_push, MEM_RAM, dax_lex);
+        }
+    }
+    else if(stment->cmd.code == SYSCMD_pop && stment->args[0].lexs_sz > 1)
+    {
+        assert(stment->args[0].memory == MEM_RAM);
+
+        put_evaluated_arg(dst_line, pos, &stment->args[0]);
+
+        Lexem dax_lex = {};
+        dax_lex.type = LEX_REGISTER;
+        dax_lex.value.code = REG_dax;
+
+        PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, dax_lex);
+        PUT_CMD_WA(SYSCMD_pop, MEM_RAM, dax_lex);
+    }
     else if(stment->cmd.is_sys) // Sys commands work with registers and memory directly, argument is one literal and can't be evaluated
     {
         PUT_CMD_WA(stment->cmd.code, stment->args[0].memory, stment->args[0].lexs[0]);
@@ -500,7 +513,20 @@ static parser_err put_statement(bin_t* dst_line, size_t* pos, Statement* stment)
     {
         for(unsigned char arg_iter = 0; arg_iter < stment->args_sz; arg_iter++)
         {
-            put_evaluated_arg(dst_line, pos, &stment->args[arg_iter], &arg_iter); // evaluates argument, pushes it to dax...dzx
+            put_evaluated_arg(dst_line, pos, &stment->args[arg_iter]); 
+
+            Lexem d$x_lex = {};
+            d$x_lex.type       = LEX_REGISTER;
+            d$x_lex.value.code = REG_dax + arg_iter;
+
+            PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lex); // pop argument to d$x (dark register)
+
+            if(stment->args[arg_iter].memory == MEM_RAM)  //if access to RAM
+            {
+                PUT_CMD_WA(SYSCMD_push, MEM_RAM, d$x_lex); // push RAM[d$x]
+
+                PUT_CMD_WA(SYSCMD_pop, MEM_NOT_RAM, d$x_lex); // pop to d$x
+            }
         }
 
         PUT_CMD(stment->cmd.code); // implicitly gets argument from dax...dzx
