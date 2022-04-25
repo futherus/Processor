@@ -1,9 +1,0 @@
-----------------------------------------------------------------------------------------------------
-Dumpsystem activated this stream (19:02:38 19.12.2021)
-
-LOG: "Execution time: 0.03125 s"
-at D:\Projects\Processor\source\CPU\cpu.cpp:99:int main(int, char**)
-
-End of log
-Dumpsystem disactivated this stream
-----------------------------------------------------------------------------------------------------

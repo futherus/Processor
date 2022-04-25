@@ -7,13 +7,12 @@
 #include <assert.h>
 
 #include "processing.h"
-#include "stack/include/Stack.h"
-#include "../binary/Binary.h"
-#include "../args/args.h"
+#include "stack/Stack.h"
+#include "../common/Binary.h"
+#include "../common/args.h"
 #include "cpu_dump.h"
-#include "../cpu_time.h"
-#include "../dumpsystem/dumpsystem.h"
-#include "../jumps.h"
+#include "../common/dumpsystem.h"
+#include "../common/jumps.h"
 
 enum cpu_error
 {
@@ -26,7 +25,7 @@ enum cpu_error
     CPU_BAD_ALLOC      = 6,
 };
 
-static int file_sz(const char filename[], ssize_t* sz)
+static int file_sz(const char filename[], size_t* sz)
 {
     assert(filename && sz);
 
@@ -34,19 +33,9 @@ static int file_sz(const char filename[], ssize_t* sz)
     if(stat(filename, &buff) == -1)
         return -1;
     
-    *sz = buff.st_size;
+    *sz = (size_t) buff.st_size;
     
     return 0;
-}
-
-static cpu_error cpu_init(CPU* cpu)
-{
-    assert(cpu);
-
-    cpu->ram = (val64_t*) calloc(MEM_CAP, sizeof(val64_t));
-    CHECK$(!cpu->ram, CPU_BAD_ALLOC, return CPU_BAD_ALLOC; )
-
-    return CPU_NOERR;
 }
 
 int main(int argc, char* argv[])
@@ -59,11 +48,12 @@ int main(int argc, char* argv[])
         response_args(msg);
         return CPU_ARGS_ERR;
     }
-
+#ifdef CPU_ENABLE_LOGS
     cpu_dump_init();
+#endif // CPU_ENABLE_LOGS
 
     Binary bin = {};
-    ssize_t binfile_sz = 0;
+    size_t binfile_sz = 0;
 
     CPU cpu = {};
 
@@ -71,32 +61,24 @@ int main(int argc, char* argv[])
     FILE* istream   = stdin;
     FILE* ostream   = stdout;
     
-    double start_time  = 0;
-    double finish_time = 0;
-
 TRY__
     CHECK$(file_sz(binfile_name, &binfile_sz), CPU_READ_FAIL, FAIL__)
 
     binstream = fopen(binfile_name, "rb");
-    CHECK$(binstream == nullptr,         CPU_READ_FAIL,  FAIL__)
+    CHECK$(binstream == nullptr,         CPU_READ_FAIL,       FAIL__)
 
-    CHECK$(stack_init(&cpu.stk, 0),      CPU_STACK_FAIL, FAIL__)
+    CHECK$(stack_init(&cpu.stk, 0),      CPU_STACK_FAIL,      FAIL__)
 
-    PASS$(binary_init(&bin, binfile_sz),                 FAIL__)
+    PASS$(binary_init(&bin, binfile_sz),                      FAIL__)
 
-    PASS$(binary_fread(&bin, binstream, binfile_sz),     FAIL__)
+    PASS$(binary_fread(&bin, binstream, binfile_sz),          FAIL__)
 
-    CHECK$(fclose(binstream),            CPU_READ_FAIL,  FAIL__)
+    CHECK$(fclose(binstream),            CPU_READ_FAIL,       FAIL__)
 
-    CHECK$(cpu_init(&cpu),               CPU_BAD_ALLOC,  FAIL__)
-
-    start_time = get_cpu_time();
+    cpu.ram = (val64_t*) calloc(MEM_CAP, sizeof(val64_t));
+    CHECK$(!cpu.ram,                     CPU_BAD_ALLOC,       FAIL__)
 
     CHECK$(processing(&bin, &cpu, istream, ostream), CPU_PROCESSING_ERR, FAIL__)
-
-    finish_time = get_cpu_time();
-
-    LOG$("Execution time: %.4lg s", finish_time - start_time)
 
 CATCH__
     ERROR__ = CPU_SYS_FAIL;
@@ -104,6 +86,7 @@ CATCH__
 FINALLY__
     stack_dstr(&cpu.stk);
     binary_dstr(&bin);
+    free(cpu.ram);
 
     return ERROR__;
 

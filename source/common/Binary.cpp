@@ -3,21 +3,20 @@
 #include <stdlib.h>
 
 #include "Binary.h"
-#include "../dumpsystem/dumpsystem.h"
+#include "dumpsystem.h"
 
-Binary_err binary_init(Binary* bin, ssize_t cap)
+Binary_err binary_init(Binary* bin, size_t cap)
 {
+    assert(cap != 0);
     CHECK$(!bin,         BIN_NULLPTR,   return BIN_NULLPTR;   )
     
-    CHECK$(cap <= 0,     BIN_SIZE_ERR,  return BIN_SIZE_ERR;  )
-
     bin->buffer = (bin_t*) calloc(cap, sizeof(bin_t));
 
     CHECK$(!bin->buffer, BIN_BAD_ALLOC, return BIN_BAD_ALLOC; )
 
     bin->ip  = 0;
     bin->sz  = 0;
-    bin->cap = (size_t) cap;
+    bin->cap = cap;
 
     return BIN_NOERR;
 }

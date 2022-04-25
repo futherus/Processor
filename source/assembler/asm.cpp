@@ -5,13 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../dumpsystem/dumpsystem.h"
-#include "text/Text.h"
-#include "../args/args.h"
+#include "Text.h"
 #include "parser.h"
-#include "../binary/Binary.h"
-#include "../jumps.h"
-#include "../cpu_time.h"
+#include "../common/jumps.h"
+#include "../common/args.h"
+#include "../common/Binary.h"
+#include "../common/dumpsystem.h"
 
 enum asm_error
 {
@@ -39,25 +38,16 @@ int main(int argc, char* argv[])
     Binary bin = {};
     FILE* ostream = nullptr;
 
-    double start_time  = 0;
-    double finish_time = 0;
-
 TRY__    
     CHECK$(text_create(&txt, infile_name), ASM_SYS_FAIL, FAIL__)
 
     PASS$(binary_init(&bin, BIN_LINE_CAP * txt.index_arr_size), FAIL__)
-
-    start_time = get_cpu_time();
 
     if(parser(&bin, &txt, infile_name))
     {
         ERROR__ = ASM_SYNTAX_ERR;
         RETURN__;
     }
-
-    finish_time = get_cpu_time();
-
-    LOG$("Execution time: %.4lg s", finish_time - start_time);
 
     ostream = fopen(outfile_name, "wb");
     CHECK$(ostream == nullptr, ASM_SYS_FAIL, FAIL__)

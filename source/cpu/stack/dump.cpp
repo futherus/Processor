@@ -1,11 +1,12 @@
-#include "include/config.h"
-#include "include/Stack.h"
-#include "include/dump.h"
+#include "config.h"
+#include "Stack.h"
+#include "dump.h"
 
 #ifndef __USE_MINGW_ANSI_STDIO
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
@@ -119,27 +120,27 @@ void dump_(const Stack* const stk,  Stack_err err, Stack_dump_lvl level, const c
                 fprintf(logstream, "    initialized: UNKNOWN\n\n");
 
             fprintf(logstream, "    buffer[%p]\n", BUF_);
-            fprintf(logstream, "    size          = %llu\n", SZ_);
-            fprintf(logstream, "    capacity      = %llu\n", CAP_);
+            fprintf(logstream, "    size          = %lu\n", SZ_);
+            fprintf(logstream, "    capacity      = %lu\n", CAP_);
 
             fprintf(logstream, "    Guards:\n");
 
 #ifdef CANARY
-            fprintf(logstream, "     stack  begin = %llx\n", BEG_STK_CAN_);
-            fprintf(logstream, "     stack  end   = %llx\n", END_STK_CAN_);
+            fprintf(logstream, "     stack  begin = %lx\n", BEG_STK_CAN_);
+            fprintf(logstream, "     stack  end   = %lx\n", END_STK_CAN_);
 
             if(BUF_ != BUF_POISON && BUF_)
             {
-                fprintf(logstream, "     buffer begin = %llx\n", BEG_BUF_CAN_);
-                fprintf(logstream, "     buffer end   = %llx\n", END_BUF_CAN_);
+                fprintf(logstream, "     buffer begin = %lx\n", BEG_BUF_CAN_);
+                fprintf(logstream, "     buffer end   = %lx\n", END_BUF_CAN_);
             }
 #endif
 
 #ifdef STACK_HASH
-            fprintf(logstream, "     stack  hash  = %llx\n", STK_HASH_);
+            fprintf(logstream, "     stack  hash  = %lx\n", STK_HASH_);
 #endif
 #ifdef BUFFER_HASH
-            fprintf(logstream, "     buffer hash  = %llx\n", BUF_HASH_);
+            fprintf(logstream, "     buffer hash  = %lx\n", BUF_HASH_);
 #endif 
 
             if(BUF_ && BUF_ != BUF_POISON)
@@ -163,7 +164,7 @@ void dump_(const Stack* const stk,  Stack_err err, Stack_dump_lvl level, const c
                     else
                         fprintf(logstream, "     ");
 
-                    fprintf(logstream, "%7.1llu: ", iter);
+                    fprintf(logstream, "%7.1lu: ", iter);
                     PRINT_ELEM(logstream, &stk->buffer[iter]);
                     fprintf(logstream, "\n");
 

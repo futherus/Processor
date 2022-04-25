@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 #include "../processor_config.h"
-#include "../binary/Binary.h"
-#include "text/Text.h"
+#include "../assembler_config.h"
+#include "../common/Binary.h"
+#include "Text.h"
 #include "lexer.h"
 
 struct Command
@@ -48,18 +49,12 @@ struct Label_array
 enum parser_err 
 {
     PARSER_NOERR               =  0,
-    PARSER_MISSING_SIGN        =  1,
-    PARSER_SIGN_DUPLICATE      =  2,
     PARSER_MISSING_PARENTHESES =  3,
     PARSER_TRAILING_SYMBOLS    =  4,
     PARSER_TRAILING_COMMA      =  5,
-    PARSER_INVALID_ARG         =  6,
     PARSER_UNKNWN_ARG          =  7,
     PARSER_NO_ARG              =  8,
     PARSER_INVALID_ARGS_NUM    =  9,
-    PARSER_LITS_FOR_SYS        = 10,
-    PARSER_SIGN_FOR_SYS        = 11,
-    PARSER_IMMCONST_FOR_POP    = 12,
     PARSER_UNKNWN_CMD          = 13,
     PARSER_NO_CMD              = 14,
     PARSER_NOTLABEL            = 15,

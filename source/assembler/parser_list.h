@@ -2,7 +2,7 @@
 #define PARSER_LIST_H
 
 #include "parser.h"
-#include "../binary/Binary.h"
+#include "../common/Binary.h"
 
 void parser_dump_init();
 

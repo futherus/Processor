@@ -5,6 +5,7 @@
 #define STACK_HASH_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * Get 64-bit FNV1 hash integer.

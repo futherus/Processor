@@ -6,7 +6,6 @@
 #include "parser.h"
 #include "lexer.h"
 #include "parser_list.h"
-#include "../../debug_tools/debug_tools.h"
 
 /// Counter of parser passes. Valid values: 1, 2
 static int ITERATION = 0;
@@ -466,6 +465,8 @@ static void put_evaluated_arg(bin_t* dst_line, size_t* pos, Argument* arg)
             case LEX_MUL:
                 PUT_CMD(SYSCMD_mul);
                 break;
+            default:
+                break;
         }
     }
 }
@@ -562,8 +563,10 @@ static parser_err parse_line(bin_t* bin_line, size_t* bin_line_sz, size_t* ip, c
         
         *ip += *bin_line_sz;
 
+#ifdef ASSEMBLER_DUMP_STATEMENTS
         if(ITERATION == 2)
             list_statement(&stment, txt);
+#endif // ASSEMBLER_DUMP_STATEMENTS
 
         return err;
     }
@@ -577,7 +580,10 @@ static parser_err parse_line(bin_t* bin_line, size_t* bin_line_sz, size_t* ip, c
 
 parser_err parser(Binary* bin, const Text* txt, const char infilename[])
 {
+#ifdef ASSEMBLER_ENABLE_LOGS
     parser_dump_init();
+#endif // ASSEMBLER_ENABLE_LOGS
+
     parser_err err = PARSER_NOERR;
 
     size_t ip = 0;
@@ -602,14 +608,18 @@ parser_err parser(Binary* bin, const Text* txt, const char infilename[])
 
             if(ITERATION == 2)
             {
+#ifdef ASSEMBLER_LISTING
                 list_line(bin_line, bin_line_sz, txt_line, line, ip);
+#endif // ASSEMBLER_LISTING
 
                 binary_sread(bin, bin_line, bin_line_sz);
             }
         }
 
+#ifdef ASSEMBLER_DUMP_LABELS
         if(ITERATION == 1)
             list_labels(label_array());
+#endif // ASSEMBLER_DUMP_LABELS
     }
     
     return PARSER_NOERR;

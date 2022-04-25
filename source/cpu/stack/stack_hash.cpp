@@ -1,4 +1,4 @@
-#include "include/stack_hash.h"
+#include "stack_hash.h"
 
 /**
  * Get 64-bit FNV1 hash integer.

@@ -1,8 +1,12 @@
 #ifndef PROCESSOR_CONFIG_H
 #define PROCESSOR_CONFIG_H
 
-//#define CPU_VERBOSE
-//#define CPU_DUMP
+//#define CPU_ENABLE_LOGS
+
+#ifdef CPU_ENABLE_LOGS
+#define CPU_VERBOSE
+#define CPU_DUMP
+#endif // CPU_ENABLE_LOGS
 
 /// Max amount of arguments for command
 const unsigned char ARGS_CAP = 0x6;

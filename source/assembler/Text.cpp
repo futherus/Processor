@@ -9,7 +9,6 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-
 ///constructor block
 static void set_index_arr(char* buffer, Index* index_arr, size_t index_arr_size)
 {
@@ -109,13 +108,12 @@ static Text_err create_index_arr(Index** dst_index_arr, size_t* dst_index_arr_si
 
     \return Size of file on success or 0 if failure occurs
 */
-static long get_file_size(char* file_name)
+static size_t get_file_size(char* file_name)
 {
     assert(file_name);
 
-    errno = 0;
     FILE* stream = fopen(file_name, "r");
-    if(errno != 0)
+    if(stream == nullptr)
         return 0;
 
     if(fseek(stream, 0, SEEK_END) != 0)
@@ -131,7 +129,7 @@ static long get_file_size(char* file_name)
     if(file_size == -1)
         return 0;
 
-    return file_size;
+    return (size_t) file_size;
 }
 
 /** \brief Creates buffer, reads file to it
@@ -152,17 +150,15 @@ static Text_err create_buffer(char** dst_buffer, size_t* dst_buffer_size, char* 
     if(buffer == nullptr)
         return TEXT_BAD_ALLOC;
 
-    errno = 0;
     FILE* istream = fopen(file_name, "r");
-    if(errno != 0)
+    if(istream == nullptr)
     {
         free(buffer);
         return TEXT_BAD_IFILE;
     }
 
-    errno = 0;
     size_t file_read = fread(buffer, sizeof(char), file_size, istream);
-    if(errno != 0)
+    if(file_read != file_size)
     {
         free(buffer);
         if(fclose(istream) == EOF)
@@ -228,7 +224,7 @@ static Text_err print_line(char* begin, char* end, FILE* ostream)
     assert(begin && end);
     assert(ostream);
 
-    size_t size = end - begin;
+    size_t size = (size_t) (end - begin);
 
     if(fwrite(begin, sizeof(char), size, ostream) != size)
         return TEXT_BAD_OFILE;

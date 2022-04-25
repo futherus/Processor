@@ -6,6 +6,7 @@
 #define TEXT_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 enum Text_err
 {
@@ -28,7 +29,7 @@ struct Index
 struct Text
 {
     size_t buffer_size = 0;
-    char* buffer       = nullptr;
+    char*  buffer      = nullptr;
 
     size_t index_arr_size = 0;
     Index* index_arr      = nullptr;

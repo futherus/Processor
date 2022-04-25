@@ -9,7 +9,7 @@
 
 #include "processing.h"
 #include "cpu_dump.h"
-#include "stack/include/Stack.h"
+#include "stack/Stack.h"
 
 static int CMP(double var1, double var2)
 {

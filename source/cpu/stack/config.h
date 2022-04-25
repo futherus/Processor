@@ -24,7 +24,7 @@
 
 #ifdef DUMP
                 /// \brief Turn on all dumps (Does not work without PROTECT and DUMP defines)
-                #define DUMP_ALL
+                // #define DUMP_ALL
 #endif
 
                 /// \brief Turn on stack hash (Does not work without PROTECT define)

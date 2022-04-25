@@ -2,8 +2,8 @@
 #define CPU_H
 
 #include "../processor_config.h"
-#include "../binary/Binary.h"
-#include "stack/include/Stack.h"
+#include "../common/Binary.h"
+#include "stack/Stack.h"
 
 struct CPU 
 {

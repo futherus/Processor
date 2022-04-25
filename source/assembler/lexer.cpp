@@ -2,8 +2,8 @@
 #include <assert.h>
 
 #include "lexer.h"
-#include "../binary/Binary.h"
-#include "../hash.h"
+#include "../common/Binary.h"
+#include "../common/hash.h"
 
 static void clean_whitespaces_(char* txt, size_t* pos)
 {
@@ -21,7 +21,6 @@ static void wordlen_(char* ptr, int* n_read)
         (*n_read)++;
 }
 
-
 #define CUR_LEXEM_ (lexs->lexems[lexs->lexems_sz])
 
 #define DEF_REG(TXT, HASH)                    \
@@ -29,7 +28,7 @@ static void wordlen_(char* ptr, int* n_read)
         CUR_LEXEM_.type       = LEX_REGISTER; \
         CUR_LEXEM_.value.code = REG_##TXT;    \
         lexs->lexems_sz++;                    \
-        pos += n_read;                        \
+        pos += (size_t) n_read;                        \
         break;                                \
 
 #define DEF_SYSCMD(TXT, HASH, N_ARGS, CODE)   \
@@ -37,7 +36,7 @@ static void wordlen_(char* ptr, int* n_read)
         CUR_LEXEM_.type       = LEX_CMD;      \
         CUR_LEXEM_.value.code = SYSCMD_##TXT; \
         lexs->lexems_sz++;                    \
-        pos += n_read;                        \
+        pos += (size_t) n_read;                        \
         break;                                \
 
 #define DEF_CMD(TXT, HASH, N_ARGS, CODE)      \
@@ -45,7 +44,7 @@ static void wordlen_(char* ptr, int* n_read)
         CUR_LEXEM_.type       = LEX_CMD;      \
         CUR_LEXEM_.value.code = CMD_##TXT;    \
         lexs->lexems_sz++;                    \
-        pos += n_read;                        \
+        pos += (size_t) n_read;                        \
         break;                                \
 
 #define DEF_SYMB(SYMB, TYPE)                  \
@@ -72,7 +71,7 @@ int lexer(Lexems_array* lexs, char* txt)
         {
             CUR_LEXEM_.type = LEX_IMMCONST;
             lexs->lexems_sz++;
-            pos += n_read;
+            pos += (size_t) n_read;
         }
         else 
         {
@@ -97,7 +96,7 @@ int lexer(Lexems_array* lexs, char* txt)
             if(n_read == 0)
                 return -1;     // UNKNOWN SYMBOLS
                 
-            uint64_t hash = qhashfnv1_64(txt + pos, n_read);
+            uint64_t hash = qhashfnv1_64(txt + pos, (size_t) n_read);
 
             switch(hash)
             {
@@ -111,7 +110,7 @@ int lexer(Lexems_array* lexs, char* txt)
                     CUR_LEXEM_.type = LEX_WORD;
                     CUR_LEXEM_.value.hash = hash;
                     lexs->lexems_sz++;
-                    pos += n_read;
+                    pos += (size_t) n_read;
                     break;
             }
         }

@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Stack/include/Stack.h"
+#include "stack/Stack.h"
 #include "processing.h"
 #include "cpu_dump.h"
-#include "../dumpsystem/dumpsystem.h"
+#include "../common/dumpsystem.h"
 
 static FILE* CPU_STREAM = nullptr;
 
@@ -35,7 +35,7 @@ void cpu_dump(CPU* cpu, size_t* ip)
         
     PRINT("\n----------------------------------------------------------------------------------------\n");
     PRINT("CPU dump\n");
-    PRINT("INSTRUCTION POINTER: %llu\n", *ip);
+    PRINT("INSTRUCTION POINTER: %lu\n", *ip);
 
     if(cpu->reg_ptr != nullptr)
         PRINT("  pointer  register: %lg [%p]\n", *cpu->reg_ptr, cpu->reg_ptr);
@@ -53,7 +53,7 @@ void cpu_dump(CPU* cpu, size_t* ip)
     {
         if(iter % 8 == 0)
             PRINT("\n");
-        PRINT("    %4llu: %10lg ", iter, cpu->ram[iter]);
+        PRINT("    %4lu: %10lg ", iter, cpu->ram[iter]);
     }
     PRINT("\n  }\n");
 
@@ -65,7 +65,7 @@ void cpu_dump(CPU* cpu, size_t* ip)
     {
         if(iter % (8 * sizeof(uint64_t)) == 0)
             PRINT("\n");
-        PRINT("    %4llu: %16llx ", iter, vram_ptr[iter]);
+        PRINT("    %4lu: %16llx ", iter, vram_ptr[iter]);
     }
     PRINT("\n  }\n");
 
@@ -75,7 +75,7 @@ void cpu_dump(CPU* cpu, size_t* ip)
     {
         if(iter % 4 == 0)
             PRINT("\n");
-        PRINT("    %4llu: %10lg ", iter, cpu->regs[iter]);
+        PRINT("    %4lu: %10lg ", iter, cpu->regs[iter]);
     }
     PRINT("\n  }\n");
     PRINT("----------------------------------------------------------------------------------------\n\n");

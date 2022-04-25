@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "../hash.h"
+#include "hash.h"
 
 //////////////////////////////////////////////
 #define DEF_SYSCMD(TEXT, hash, n_args, code) \
@@ -52,9 +52,9 @@ union cmd_t
 {
     struct
     {
-        unsigned char cmd: 6;
-        unsigned char reg: 1;
-        unsigned char mem: 1;
+        unsigned int cmd: 6;
+        unsigned int reg: 1;
+        unsigned int mem: 1;
     } bits;
     
     unsigned char byte;
@@ -84,7 +84,7 @@ struct Binary
     size_t cap    = 0;         ///< Size of allocated memory (in sizeof(bin_t))
 };
 
-Binary_err binary_init(Binary* bin, ssize_t cap);
+Binary_err binary_init(Binary* bin, size_t cap);
 
 Binary_err binary_sread(Binary* bin, void* src, size_t count);
 

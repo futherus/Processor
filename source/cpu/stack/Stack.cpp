@@ -1,6 +1,6 @@
-#include "include/config.h"
-#include "include/Stack.h"
-#include "include/stack_hash.h"
+#include "config.h"
+#include "Stack.h"
+#include "stack_hash.h"
 
 #ifndef __USE_MINGW_ANSI_STDIO
 #define __USE_MINGW_ANSI_STDIO 1
@@ -115,7 +115,7 @@ Stack_err stack_init_(Stack* stk, ssize_t preset_cap
         if(preset_cap < 0)
             preset_cap = 0;
         
-        size_t capacity = stack_init_cap_(preset_cap);
+        size_t capacity = stack_init_cap_((size_t) preset_cap);
 
         ASSERT(stack_resize_(stk, capacity) == 0, Stack_err::BAD_ALLOC);        
     }
