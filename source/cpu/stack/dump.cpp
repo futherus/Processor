@@ -245,7 +245,7 @@ Stack_err stack_dump_(const Stack* const stk, const char msg[],
 
 #else // DUMP
 
-void stack_dump_init(FILE* dumpstream, void (*print_func)(FILE*, const Elem_t*))
+void stack_dump_init(FILE*, void (*)(FILE*, const Elem_t*))
 {
     void(0);
 }
