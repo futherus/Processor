@@ -6,10 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../processor_config.h"
 #include "stack/Stack.h"
 #include "processing.h"
 #include "cpu_dump.h"
 #include "../common/dumpsystem.h"
+
+#ifdef VERBOSE
 
 static FILE* CPU_STREAM = nullptr;
 
@@ -98,3 +101,22 @@ void cpu_dump_cmd(const char* cmd_txt, val64_t* args, unsigned char args_sz)
 
     fflush(stream);
 }
+
+#else // VERBOSE
+
+void cpu_dump_init()
+{
+    void(0);
+}
+
+void cpu_dump(CPU*, size_t*)
+{
+    void(0);
+}
+
+void cpu_dump_cmd(const char*, val64_t*, unsigned char)
+{
+    void(0);
+}
+
+#endif // VERBOSE

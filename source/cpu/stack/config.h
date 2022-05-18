@@ -13,7 +13,7 @@
                 const char STACK_DUMPFILE[] = "";
 
                 /// \brief Turn on protection for stack
-                #define PROTECT
+                // #define PROTECT
 
 #ifdef PROTECT
                 /// \brief Turn on canary protection (Does not work without PROTECT define)
